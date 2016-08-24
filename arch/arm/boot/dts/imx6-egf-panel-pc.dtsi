@@ -492,7 +492,7 @@
 	status = "okay";
 
 	ov5640_mipi: ov5640_mipi@3c { /* i2c2 driver */
-		compatible = "ovti,ov5640_mipi";
+		compatible = "ovti,ov564x_mipi";
 		reg = <0x3c>;
 		clocks = <&clks 201>;
 		clock-names = "csi_mclk";
@@ -751,7 +751,7 @@
 &mipi_csi {
     status = "okay";
     ipu_id = <0>;
-    csi_id = <1>;
+    csi_id = <0>;
     v_channel = <0>;
     lanes = <2>;
 };
