@@ -160,20 +160,6 @@
 		late_init = <0>;
 		status = "okay";
 	};
-
-	wlan {
-		compatible = "ti,wilink6";
-		interrupt-parent = <&gpio5>;
-		interrupts = <30 IRQ_TYPE_LEVEL_HIGH>;
-		clocks = <&refclock>;
-		clock-names = "refclock";
-
-		refclock: refclock {
-			compatible = "ti,wilink-clock";
-			#clock-cells = <0>;
-			clock-frequency = <38400000>;
-		};
-	};
 		
 	backlight: backlight {
 		compatible = "pwm-backlight";
@@ -717,6 +703,17 @@
 	non-removable;    /* non-removable is not a variable, the fact it is */
 	                  /* listed is all that is used by driver  */
 	cap-power-off-card;
+	
+	#address-cells = <1>;
+	#size-cells = <0>;
+	wlcore: wlcore@2 {
+		compatible = "ti,wl1271";
+		reg = <2>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <30 IRQ_TYPE_LEVEL_HIGH>;
+		ref-clock-frequency = <38400000>;
+	};
+	
 };
 
 //eMMC Flash Interna
