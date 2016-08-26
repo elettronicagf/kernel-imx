@@ -624,6 +624,69 @@ static int sx150x_install_irq_chip(struct sx150x_chip *chip,
 	return err;
 }
 
+static struct sx150x_platform_data *of_sx150x_get_platdata(
+					struct i2c_client *client)
+{
+	int rc, gpio;
+	struct sx150x_platform_data *pdata;
+	struct device_node *np;
+
+	if (!client->dev.of_node){
+		return NULL;
+	}
+
+	np = client->dev.of_node;
+
+	pdata = devm_kzalloc(&client->dev, sizeof(*pdata), GFP_KERNEL);
+	if (!pdata)
+		return ERR_PTR(-ENOMEM);
+
+	gpio = of_get_named_gpio(np, "int-gpios", 0);
+	if (gpio_is_valid(gpio)) {
+		rc = devm_gpio_request_one(&client->dev, gpio,
+			GPIOF_DIR_IN, "sx150x_interrupt");
+		if (rc)
+			return ERR_PTR(rc);
+	}
+
+	pdata->irq_summary = irq_of_parse_and_map(np, 0);
+	if (!pdata->irq_summary)
+		return ERR_PTR(-EPROBE_DEFER);
+
+	pdata->oscio_is_gpo = of_property_read_bool(np, "oscio_is_gpo");
+	pdata->reset_during_probe =
+			of_property_read_bool(np, "reset_during_probe");
+
+	rc = of_property_read_u16(np, "pullup_ena",
+				&pdata->io_pullup_ena);
+	if (rc)
+		pdata->io_pullup_ena = 0;
+
+	rc = of_property_read_u16(np, "pulldn_ena",
+				&pdata->io_pulldn_ena);
+	if (rc)
+		pdata->io_pulldn_ena = 0;
+
+	rc = of_property_read_u16(np, "open_drain_ena",
+				&pdata->io_open_drain_ena);
+	if (rc)
+		pdata->io_open_drain_ena = 0;
+
+	rc = of_property_read_u16(np, "polarity",
+				&pdata->io_polarity);
+	if (rc)
+		pdata->io_polarity = 0;
+
+	/* Let OF gpiochip_add to detect dynamical gpio_base & irq_base */
+	pdata->gpio_base = -1;
+	/* We should use the dynamical irq_base */
+	pdata->irq_base = 0;
+
+	return pdata;
+}
+
+
+
 static int sx150x_probe(struct i2c_client *client,
 				const struct i2c_device_id *id)
 {
@@ -634,8 +697,13 @@ static int sx150x_probe(struct i2c_client *client,
 	int rc;
 
 	pdata = dev_get_platdata(&client->dev);
-	if (!pdata)
-		return -EINVAL;
+	if (!pdata) {
+		pdata = of_sx150x_get_platdata(client);
+		if (!pdata)
+			return -EINVAL;
+		else if (IS_ERR(pdata))
+			return PTR_ERR(pdata);
+	}
 
 	if (!i2c_check_functionality(client->adapter, i2c_funcs))
 		return -ENOSYS;
