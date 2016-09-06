@@ -510,6 +510,14 @@
 		VDDIO-supply = <&reg_audio_dummy>;
 		VDDD-supply = <&reg_1v8_audio_dummy>;
 	};
+	
+	ft5x06_ts@38 {
+        compatible = "ft5x06,ft5x06-touch";
+       	reg = <0x38>;
+       	interrupt-parent = <&gpio7>;
+       	interrupts= <11 IRQ_TYPE_EDGE_FALLING>;
+       	wakeup-gpios = <&gpio7 11 0>;
+        };
 };
 
 &i2c2 {
