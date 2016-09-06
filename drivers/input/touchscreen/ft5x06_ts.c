@@ -95,6 +95,8 @@ struct ft5x06_ts {
 	unsigned		down_mask;
 	unsigned		max_x;
 	unsigned		max_y;
+	u8			invert_x_axis;
+	u8			invert_y_axis;
 };
 static const char *client_name = "ft5x06";
 
@@ -169,8 +171,14 @@ static inline void ts_evt_add(struct ft5x06_ts *ts,
 			input_mt_slot(idev, p[i].id);
 			input_mt_report_slot_state(idev,  MT_TOOL_FINGER, 1);
 			down_mask |= 1 << p[i].id;
-			input_report_abs(idev, ABS_MT_POSITION_X, p[i].x);
-			input_report_abs(idev, ABS_MT_POSITION_Y, p[i].y);
+			if (ts->invert_x_axis == 0)
+				input_report_abs(idev, ABS_MT_POSITION_X, p[i].x);
+			else
+				input_report_abs(idev, ABS_MT_POSITION_X, ts->max_x - p[i].x);
+			if (ts->invert_y_axis == 0)
+				input_report_abs(idev, ABS_MT_POSITION_Y, p[i].y);
+			else
+				input_report_abs(idev, ABS_MT_POSITION_Y, ts->max_y - p[i].y);
 		}
 		tmp = ts->down_mask & ~down_mask;
 		ts->down_mask = down_mask;
@@ -179,8 +187,14 @@ static inline void ts_evt_add(struct ft5x06_ts *ts,
 		translate(&p[0].x, &p[0].y);
 #endif
 #ifdef USE_ABS_SINGLE
-		input_report_abs(idev, ABS_X, p[0].x);
-		input_report_abs(idev, ABS_Y, p[0].y);
+		if (ts->invert_x_axis == 0)
+			input_report_abs(idev, ABS_X, p[0].x);
+		else
+			input_report_abs(idev, ABS_X, ts->max_x - p[0].x);
+		if (ts->invert_y_axis == 0)
+			input_report_abs(idev, ABS_Y, p[0].y);
+		else
+			input_report_abs(idev, ABS_Y, ts->max_y - p[0].y);
 		input_report_abs(idev, ABS_PRESSURE, 1);
 		input_report_key(idev, BTN_TOUCH, 1);
 #endif
@@ -531,6 +545,15 @@ static int ts_probe(struct i2c_client *client, const struct i2c_device_id *id)
 	}
 	ts->client = client;
 	ts->irq = client->irq ;
+
+	if (of_property_read_u8(np, "invert-x-axis", &ts->invert_x_axis))
+		ts->invert_x_axis = 0;
+	printk(KERN_INFO "Invert x axis value %d\n", ts->invert_x_axis);
+
+	if(of_property_read_u8(np, "invert-y-axis", &ts->invert_y_axis))
+		ts->invert_y_axis = 0;
+	printk(KERN_INFO "Invert y axis value %d\n", ts->invert_y_axis);
+
 	ts->gp = of_get_named_gpio(np, "wakeup-gpios", 0);
 	if (!gpio_is_valid(ts->gp))
 		return -ENODEV;

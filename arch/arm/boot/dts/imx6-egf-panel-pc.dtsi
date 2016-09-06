@@ -517,6 +517,8 @@
        	interrupt-parent = <&gpio7>;
        	interrupts= <11 IRQ_TYPE_EDGE_FALLING>;
        	wakeup-gpios = <&gpio7 11 0>;
+       	invert-x-axis = /bits/ 8 <1>;
+       	invert-y-axis = /bits/ 8 <1>;
         };
 };
 
