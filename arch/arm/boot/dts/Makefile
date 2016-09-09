@@ -268,9 +268,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6dl-phytec-pbab01.dtb \
 	imx6dl-rex-basic.dtb \
 	imx6dl-riotboard.dtb \
-	imx6-egf-WID0510_AA01.01.dtb \
-	imx6-egf-WID0510_AB01.01.dtb \
-	imx6-egf-WID0510_AC01.01.dtb \
+	imx6-egf-WID0500_AA01.01.dtb \
 	imx6dl-sabreauto.dtb \
 	imx6dl-sabreauto-ecspi.dtb \
 	imx6dl-sabreauto-enetirq.dtb \

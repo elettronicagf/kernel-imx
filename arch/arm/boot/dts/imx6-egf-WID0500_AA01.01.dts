@@ -10,14 +10,10 @@
  */
 
 /dts-v1/;
-#include "imx6dl.dtsi"
-#include "imx6-egf-panel-pc.dtsi"
+#include "imx6q.dtsi"
+#include "imx6-egf-evb-pop.dtsi"
 
 / {
-	model = "Elettronica GF - i.MX6DL 0533";
-	compatible = "egf,imx6dl-egf","fsl,imx6dl";
-};
-
-&epdc {
-	status = "disabled";
+	model = "Elettronica GF - i.MX6D 0541";
+	compatible = "egf,imx6q-egf","fsl,imx6q"; 
 };
