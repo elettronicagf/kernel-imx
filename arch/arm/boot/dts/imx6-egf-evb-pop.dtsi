@@ -183,6 +183,10 @@
 	
 };
 
+&snvs_poweroff {
+	status = "okay";
+};
+
 &audmux {
 	status = "okay";
 };
