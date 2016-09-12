@@ -147,7 +147,21 @@
 		compatible = "fsl,mxc_v4l2_output";
 		status = "okay";
 	};
-	
+
+	sound {
+		compatible = "fsl,imx-egf-pop-sgtl5000",
+			     "fsl,imx-audio-sgtl5000";
+		model = "imx-egf-pop-sgtl5000";
+		ssi-controller = <&ssi1>;
+		audio-codec = <&codec>;
+		audio-routing =
+			"Line Out Jack", "LINE_OUT",
+			"MIC_IN", "Mic Jack",
+			"Mic Jack", "Mic Bias";		
+		mux-int-port = <1>;
+		mux-ext-port = <5>;
+	};
+
 	leds {
 		compatible = "gpio-leds";
 		power_on_led {
@@ -319,6 +333,16 @@
 		compatible = "nxp,pcf85063";
 		reg = <0x51>;
 	};
+
+	codec: sgtl5000@0a {
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks 201>;
+		VDDA-supply = <&reg_audio_dummy>;
+		VDDIO-supply = <&reg_audio_dummy>;
+		VDDD-supply = <&reg_1v8_audio_dummy>;
+	};
+	
 	
 	// The MCP3021 is 100kHz clock only */
 	batt_adc: mcp3021@4d {
