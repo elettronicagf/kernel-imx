@@ -343,6 +343,12 @@
 		VDDD-supply = <&reg_1v8_audio_dummy>;
 	};
 	
+	// eeprom factory data (carrier)
+	24c64@54 {
+		compatible = "fsl,24c64";
+		reg = <0x54>;
+		pagesize = <32>;
+	};
 	
 	// The MCP3021 is 100kHz clock only */
 	batt_adc: mcp3021@4d {
