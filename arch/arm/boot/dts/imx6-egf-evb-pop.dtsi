@@ -319,6 +319,13 @@
 		compatible = "nxp,pcf85063";
 		reg = <0x51>;
 	};
+	
+	// The MCP3021 is 100kHz clock only */
+	batt_adc: mcp3021@4d {
+		compatible = "microchip,mcp3021";
+		reg = <0x4d>;
+	};	
+	
 };
 
 &i2c2 {
