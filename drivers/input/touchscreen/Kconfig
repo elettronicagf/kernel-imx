@@ -1067,4 +1067,14 @@ config TOUCHSCREEN_FT5X06_SINGLE_TOUCH
           on the FT5X06 I2C controller.
           If you say "no", you'll get the normal 5-finger goodness.
 
+config TOUCHSCREEN_AR1020_SPI
+        tristate "Microchip AR1020 SPI touchscreen"
+        depends on SPI_MASTER
+        help
+          Say Y here if you have a Microchip AR1020 SPI Controller and
+          want to enable support for the built-in touchscreen.
+
+          To compile this driver as a module, choose M here: the
+          module will be called ar1020-spi.
+
 endif
