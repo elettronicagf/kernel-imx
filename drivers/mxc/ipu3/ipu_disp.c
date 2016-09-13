@@ -1083,8 +1083,8 @@ int32_t ipu_init_sync_panel(struct ipu_soc *ipu, int disp, uint32_t pixel_clk,
 
 	dev_dbg(ipu->dev, "panel size = %d x %d\n", width, height);
 
-	if ((v_sync_width == 0) || (h_sync_width == 0))
-		return -EINVAL;
+//	if ((v_sync_width == 0) || (h_sync_width == 0))
+//		return -EINVAL;
 
 	adapt_panel_to_ipu_restricitions(ipu, &v_start_width, &v_sync_width, &v_end_width);
 	h_total = width + h_sync_width + h_start_width + h_end_width;
