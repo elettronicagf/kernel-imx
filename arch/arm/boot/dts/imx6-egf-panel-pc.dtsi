@@ -21,6 +21,8 @@
 		EGF_BLC1136 = &EGF_BLC1136;
 		EGF_BLC1134 = &EGF_BLC1134;
 		EGF_BLC1133 = &EGF_BLC1133;
+		ft5x06 = &ft5x06;
+		ar1020 = &ar1020;
 	};
 
 	chosen {
@@ -442,7 +444,7 @@
 	cs-gpios = <&gpio3 29 0>, <&gpio5 2 0>;
 	status = "okay";
 
-	ar1020@0 {
+	ar1020: ar1020@0 {
 		compatible = "microchip,ar1020-spi";
 		interrupt-parent = <&gpio3>;   //GPIO3_IO27
 		interrupts = <27 IRQ_TYPE_EDGE_RISING>;
@@ -511,7 +513,7 @@
 		VDDD-supply = <&reg_1v8_audio_dummy>;
 	};
 	
-	ft5x06_ts@38 {
+	ft5x06: ft5x06_ts@38 {
         compatible = "ft5x06,ft5x06-touch";
        	reg = <0x38>;
        	interrupt-parent = <&gpio7>;
