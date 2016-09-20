@@ -521,6 +521,29 @@
 };
 
 //eMMC Flash Interna
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>;
+	bus-width = <4>;
+	non-removable;
+	no-1-8-v;
+	keep-power-in-suspend;
+    enable-sdio-wakeup;
+    cap-power-off-card;
+    vmmc-supply = <&reg_wlan_en>;
+	status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	wlcore: wlcore@2 { 
+		compatible = "ti,wl1837";
+		reg = <2>;
+		interrupt-parent = <&gpio6>;
+		interrupts = <5 IRQ_TYPE_LEVEL_HIGH>;
+	};
+};
+
+
+//eMMC Flash Interna
 &usdhc3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc3>;
@@ -546,6 +569,7 @@
 	hnp-disable;
 	adp-disable;
 	status = "okay";
+
 };
 
 &mipi_csi {
