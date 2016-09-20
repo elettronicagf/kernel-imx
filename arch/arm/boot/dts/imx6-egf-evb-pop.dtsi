@@ -245,6 +245,18 @@
 	};
 };
 
+&can2 {
+	status = "okay";
+};
+
+&pwm3 {
+	status = "okay";
+};
+
+&pwm1 {
+	status = "okay";
+};
+
 &cpu0 {
 	arm-supply = <&sw1a_reg>;
 	soc-supply = <&sw1c_reg>;
@@ -311,6 +323,13 @@
 		};
 	};
 };
+
+&ecspi3 {
+	fsl,spi-num-chipselects = <2>;
+	cs-gpios = <&gpio4 24 0>, <&gpio4 25 0>;
+	status = "okay";
+};
+
 &ecspi4 {
 	fsl,spi-num-chipselects = <2>;
 	cs-gpios = <&gpio3 29 0>, <&gpio5 2 0>;
