@@ -48,10 +48,11 @@
 		reg_usb_otg_vbus: regulator@0 {
 			compatible = "regulator-fixed";
 			reg = <0>;
+			gpio = <&gpio2 1 0>;
 			regulator-name = "usb_otg_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			regulator-always-on;
+			enable-active-low;
 		};
 		
 		reg_lcd_vdd_dummy: regulator@3 {
@@ -132,6 +133,18 @@
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
 			regulator-always-on;		
+		};
+
+		reg_pb_clr: regulator@11 {
+			compatible = "regulator-fixed";
+			reg = <11>;
+			regulator-name = "pb_clr";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			startup-delay-us = <200000>;
+			gpio = <&gpio5 19 0>;
+			enable-active-high;
+			regulator-always-on;
 		};
 	};
 	
