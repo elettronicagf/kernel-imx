@@ -21,6 +21,7 @@
 		EGF_BLC1136 = &EGF_BLC1136;
 		EGF_BLC1134 = &EGF_BLC1134;
 		EGF_BLC1133 = &EGF_BLC1133;
+		EGF_BLC1135 = &EGF_BLC1135;
 		ft5x06 = &ft5x06;
 		ar1020 = &ar1020;
 	};
@@ -303,6 +304,17 @@
 				vback-porch = <18>;
 				vfront-porch = <18>;
 				hsync-len = <60>;
+				vsync-len = <10>;
+			};
+			EGF_BLC1135: 13080smlb4rb0s {
+				clock-frequency = <40000000>;
+				hactive = <800>;
+				vactive = <600>;
+				hback-porch = <46>;
+				hfront-porch = <210>;
+				vback-porch = <23>;
+				vfront-porch = <12>;
+				hsync-len = <20>;
 				vsync-len = <10>;
 			};
 		};
