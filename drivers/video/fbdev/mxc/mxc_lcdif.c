@@ -56,6 +56,12 @@ static struct fb_videomode lcdif_modedb[] = {
 	0,},
 	{
 	/* 800x480 @ 60 Hz , pixel clk @ 40MHz */
+	"EGF_BLC1113",  60, 800, 480, 25000, 45, 210, 22, 132, 1, 1,
+	FB_SYNC_CLK_LAT_FALL,
+	FB_VMODE_NONINTERLACED,
+	0,},
+	{
+	/* 800x480 @ 60 Hz , pixel clk @ 40MHz */
 	"EGF_BLC1081",  60, 800, 480, 25000, 45, 210, 22, 132, 0, 0,
 	FB_SYNC_CLK_LAT_FALL | FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
 	FB_VMODE_NONINTERLACED,
