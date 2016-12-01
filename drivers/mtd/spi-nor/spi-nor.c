@@ -385,68 +385,25 @@ erase_err:
 
 static int stm_lock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 {
-	struct mtd_info *mtd = nor->mtd;
-	uint32_t offset = ofs;
 	uint8_t status_old, status_new;
-	int ret = 0;
 
 	status_old = read_sr(nor);
 
-	if (offset < mtd->size - (mtd->size / 2))
-		status_new = status_old | SR_BP2 | SR_BP1 | SR_BP0;
-	else if (offset < mtd->size - (mtd->size / 4))
-		status_new = (status_old & ~SR_BP0) | SR_BP2 | SR_BP1;
-	else if (offset < mtd->size - (mtd->size / 8))
-		status_new = (status_old & ~SR_BP1) | SR_BP2 | SR_BP0;
-	else if (offset < mtd->size - (mtd->size / 16))
-		status_new = (status_old & ~(SR_BP0 | SR_BP1)) | SR_BP2;
-	else if (offset < mtd->size - (mtd->size / 32))
-		status_new = (status_old & ~SR_BP2) | SR_BP1 | SR_BP0;
-	else if (offset < mtd->size - (mtd->size / 64))
-		status_new = (status_old & ~(SR_BP2 | SR_BP0)) | SR_BP1;
-	else
-		status_new = (status_old & ~(SR_BP2 | SR_BP1)) | SR_BP0;
-
-	/* Only modify protection if it will not unlock other areas */
-	if ((status_new & (SR_BP2 | SR_BP1 | SR_BP0)) >
-				(status_old & (SR_BP2 | SR_BP1 | SR_BP0))) {
-		write_enable(nor);
-		ret = write_sr(nor, status_new);
-	}
-
-	return ret;
+	status_new = status_old | (SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
+	write_enable(nor);
+	return write_sr(nor, status_new);
 }
 
 static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 {
-	struct mtd_info *mtd = nor->mtd;
-	uint32_t offset = ofs;
 	uint8_t status_old, status_new;
 	int ret = 0;
 
 	status_old = read_sr(nor);
 
-	if (offset+len > mtd->size - (mtd->size / 64))
-		status_new = status_old & ~(SR_BP2 | SR_BP1 | SR_BP0);
-	else if (offset+len > mtd->size - (mtd->size / 32))
-		status_new = (status_old & ~(SR_BP2 | SR_BP1)) | SR_BP0;
-	else if (offset+len > mtd->size - (mtd->size / 16))
-		status_new = (status_old & ~(SR_BP2 | SR_BP0)) | SR_BP1;
-	else if (offset+len > mtd->size - (mtd->size / 8))
-		status_new = (status_old & ~SR_BP2) | SR_BP1 | SR_BP0;
-	else if (offset+len > mtd->size - (mtd->size / 4))
-		status_new = (status_old & ~(SR_BP0 | SR_BP1)) | SR_BP2;
-	else if (offset+len > mtd->size - (mtd->size / 2))
-		status_new = (status_old & ~SR_BP1) | SR_BP2 | SR_BP0;
-	else
-		status_new = (status_old & ~SR_BP0) | SR_BP2 | SR_BP1;
-
-	/* Only modify protection if it will not lock other areas */
-	if ((status_new & (SR_BP2 | SR_BP1 | SR_BP0)) <
-				(status_old & (SR_BP2 | SR_BP1 | SR_BP0))) {
-		write_enable(nor);
-		ret = write_sr(nor, status_new);
-	}
+	status_new = status_old & ~(SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
+	write_enable(nor);
+	ret = write_sr(nor, status_new);
 
 	return ret;
 }
@@ -630,6 +587,7 @@ static const struct spi_device_id spi_nor_ids[] = {
 	{ "s25fl016k",  INFO(0xef4015,      0,  64 * 1024,  32, SECT_4K) },
 	{ "s25fl064k",  INFO(0xef4017,      0,  64 * 1024, 128, SECT_4K) },
 	{ "s25fl132k",  INFO(0x014016,      0,  64 * 1024,  64, 0) },
+	{ "s25fl116k",  INFO(0x014015,      0,  64 * 1024,  32, 0) },
 
 	/* SST -- large erase sizes are "overlays", "sectors" are 4K */
 	{ "sst25vf040b", INFO(0xbf258d, 0, 64 * 1024,  8, SECT_4K | SST_WRITE) },
@@ -1107,7 +1065,8 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
 	mtd->_read = spi_nor_read;
 
 	/* nor protection support for STmicro chips */
-	if (JEDEC_MFR(info) == CFI_MFR_ST) {
+	if (JEDEC_MFR(info) == CFI_MFR_ST ||
+		JEDEC_MFR(info) == CFI_MFR_CYPRESS) {
 		nor->flash_lock = stm_lock;
 		nor->flash_unlock = stm_unlock;
 	}

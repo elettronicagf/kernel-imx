@@ -551,6 +551,7 @@ struct cfi_fixup {
 #define CFI_MFR_ST		0x0020 /* STMicroelectronics */
 #define CFI_MFR_TOSHIBA		0x0098
 #define CFI_MFR_WINBOND		0x00DA
+#define CFI_MFR_CYPRESS		0x0001	//S25FL116K see datasheet, Legacy Device Identification Commands
 
 void cfi_fixup(struct mtd_info *mtd, struct cfi_fixup* fixups);
 

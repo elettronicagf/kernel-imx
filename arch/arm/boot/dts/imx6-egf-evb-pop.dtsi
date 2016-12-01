@@ -337,21 +337,15 @@
 	};
 };
 
-&ecspi3 {
-	fsl,spi-num-chipselects = <2>;
-	cs-gpios = <&gpio4 24 0>, <&gpio4 25 0>;
-	status = "okay";
-};
-
 &ecspi4 {
-	fsl,spi-num-chipselects = <2>;
-	cs-gpios = <&gpio3 29 0>, <&gpio5 2 0>;
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio5 2 0>;
 	status = "okay";
 
-	flash: m25p80@1 {
-		compatible = "sst,s25fl132k";
+	flash: m25p80@0 {
+		compatible = "sst,s25fl116k";
 		spi-max-frequency = <20000000>;
-		reg = <1>;
+		reg = <0>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		mtd0@00000000 {
@@ -364,7 +358,7 @@
 		};
 		mtd2@00140000 {
 			label = "DATA";
-			reg = <0x140000 0x2C0000>;
+			reg = <0x140000 0x0C0000>;
 		};
 
 	};
