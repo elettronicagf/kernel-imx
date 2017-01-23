@@ -104,7 +104,6 @@
 			regulator-name = "wlan-supply";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
-			startup-delay-us = <200000>;
 			gpio = <&gpio5 21 0>;
 			enable-active-high;
 			regulator-boot-on;
@@ -121,8 +120,6 @@
 			vin-supply = <&reg_wlan>;
 			gpio = <&gpio2 22 0>;
 			enable-active-high;
-			regulator-boot-on;
-			regulator-always-on;
 		};
 		
 		reg_audio_dummy: regulator@9 {

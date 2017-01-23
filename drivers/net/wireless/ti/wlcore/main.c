@@ -6432,6 +6432,13 @@ static void wlcore_nvs_cb(const struct firmware *fw, void *context)
 	else
 		wl->irq_flags |= IRQF_ONESHOT;
 
+
+	ret = wl12xx_set_power_on(wl);
+	if (ret < 0) {
+		wl1271_error("wl12xx_set_power_on() failed: %d", ret);
+		return ret;
+	}
+		
 	ret = request_threaded_irq(wl->irq, hardirq_fn, wlcore_irq,
 				   wl->irq_flags, pdev->name, wl);
 	if (ret < 0) {
