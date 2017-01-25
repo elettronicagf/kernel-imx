@@ -449,6 +449,19 @@
 		};
 	};
 };
+
+&ecspi2 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio2 26 0>;
+	status = "okay";
+	
+	chip1: spidev@0 {
+		   compatible = "spidev";
+		   spi-max-frequency = <1000000>;
+		   reg = <0>;
+	};	
+};
+
 &ecspi4 {
 	fsl,spi-num-chipselects = <2>;
 	cs-gpios = <&gpio3 29 0>, <&gpio5 2 0>;
