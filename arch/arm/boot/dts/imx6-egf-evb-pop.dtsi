@@ -15,11 +15,9 @@
 / {
 	aliases {
 		mxcfb0 = &mxcfb1;
-		lvds_channel1 = &lvds_channel1;
-		lvds_channel1_timings = &lvds_channel1_timings;
-		EGF_BLC1136 = &EGF_BLC1136;
-		EGF_BLC1134 = &EGF_BLC1134;
-		EGF_BLC1133 = &EGF_BLC1133;
+		lvds_channel0 = &lvds_channel0;
+		lvds_channel0_timings = &lvds_channel0_timings;
+		EGF_BLC1093 = &EGF_BLC1093;
 	};
 
 	chosen {
@@ -151,10 +149,18 @@
 	mxcfb1: fb@0 {
 		compatible = "fsl,mxc_sdc_fb";
 		disp_dev = "ldb";
-		interface_pix_fmt = "RGB24";
-		default_bpp = <24>;
+		interface_pix_fmt = "RGB666";
+		default_bpp = <18>;
 		int_clk = <0>;
 		late_init = <0>;
+		status = "okay";
+	};
+	
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm3 0 50000>;
+		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
+		default-brightness-level = <11>;
 		status = "okay";
 	};
 	
@@ -213,46 +219,25 @@
 	status = "okay";
 	enable-active-high;
 
-	lvds_channel1: lvds-channel@1 {
+	lvds_channel0: lvds-channel@0 {
 		fsl,data-mapping = "spwg";
-		fsl,data-width = <24>;
+		fsl,data-width = <18>;
 		crtc = "ipu1-di0";
 		status = "okay";
 		primary;
 
-		lvds_channel1_timings: display-timings {
-			EGF_BLC1136: g104s1l01 {
+		lvds_channel0_timings: display-timings {
+			native-mode = <&EGF_BLC1093>;
+			EGF_BLC1093: kwh070kq13-f02 {
 				clock-frequency = <40000000>;
 				hactive = <800>;
-				vactive = <600>;
-				hback-porch = <128>;
-				hfront-porch = <128>;
-				vback-porch = <14>;
-				vfront-porch = <14>;
-				hsync-len = <60>;
+				vactive = <480>;
+				hback-porch = <45>;
+				hfront-porch = <210>;
+				vback-porch = <22>;
+				vfront-porch = <132>;
+				hsync-len = <1>;
 				vsync-len = <1>;
-			};
-			EGF_BLC1134: g121i1l01 {
-				clock-frequency = <71000000>;
-				hactive = <1280>;
-				vactive = <800>;
-				hback-porch = <80>;
-				hfront-porch = <80>;
-				vback-porch = <12>;
-				vfront-porch = <11>;
-				hsync-len = <60>;
-				vsync-len = <10>;
-			};
-			EGF_BLC1133: dlc1010azgt6 {
-				clock-frequency = <51200000>;
-				hactive = <1024>;
-				vactive = <600>;
-				hback-porch = <160>;
-				hfront-porch = <160>;
-				vback-porch = <18>;
-				vfront-porch = <18>;
-				hsync-len = <60>;
-				vsync-len = <10>;
 			};
 		};
 	};
@@ -263,6 +248,8 @@
 };
 
 &pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3>;
 	status = "okay";
 };
 
@@ -332,6 +319,11 @@
 				MX6QDL_PAD_RGMII_RD2__RGMII_RD2		0x1b0b0
 				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x1b0b0
 				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x1b0b0
+			>;
+		};
+		pinctrl_pwm3: pwm3grp {
+			fsl,pins = <
+				MX6QDL_PAD_SD4_DAT1__PWM3_OUT 		0x1b0b1
 			>;
 		};
 	};
