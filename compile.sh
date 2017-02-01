@@ -43,6 +43,7 @@ if [ -z arch/arm/boot/zImage ]; then
 fi
 
 compile_dts 0500_AA01.01 $OUTPUTDIR
+compile_dts 0500_AB01.01 $OUTPUTDIR
 
 cp arch/arm/boot/zImage $OUTPUTDIR
 
