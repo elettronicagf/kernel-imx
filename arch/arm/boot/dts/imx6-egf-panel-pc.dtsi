@@ -722,6 +722,8 @@
 // UART5 - 4 fili 
 &uart5 {
 	fsl,uart-has-rtscts;
+	linux,rs485-enabled-at-boot-time;
+	linux,rs485-rts-after-send;
 	status = "okay";
 };
 
