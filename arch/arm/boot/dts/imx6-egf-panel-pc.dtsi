@@ -22,6 +22,10 @@
 		EGF_BLC1134 = &EGF_BLC1134;
 		EGF_BLC1133 = &EGF_BLC1133;
 		EGF_BLC1135 = &EGF_BLC1135;
+		backlight1 = &backlight1;
+		backlight2 = &backlight2;
+		panel1 = &panel1;
+		panel2 = &panel2;
 		ft5x06 = &ft5x06;
 		ar1020 = &ar1020;
 	};
@@ -162,12 +166,23 @@
 		status = "okay";
 	};
 		
-	backlight: backlight {
+	backlight1: backlight1 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm4 0 50000>;
 		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
 		default-brightness-level = <11>;
 		enable-gpios = <&gpio3 8 0>;
+		status = "okay";
+	};
+	
+	backlight2: backlight2 {
+		compatible = "pwm-backlight-dual";
+		pwms = <&pwm4 0 50000>, <&pwm1 0 50000>;
+		pwm-names = "backlight1", "backlight2";
+		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
+		default-brightness-level = <11>;
+		enable1-gpios = <&gpio3 8 0>;
+		enable2-gpios = <&gpio3 14 0>;
 		status = "okay";
 	};
 	
@@ -194,11 +209,18 @@
 		status = "okay";
 	};
 	
-	panel: panel {
+	panel1: panel1 {
 		compatible = "simple-panel";
 		enable-gpios = <&gpio6 16 0>;
-		backlight = <&backlight>;
+		backlight = <&backlight1>;
 		status = "okay";
+	};	
+	
+	panel2: panel2 {
+		compatible = "simple-panel";
+		enable-gpios = <&gpio6 16 0>;
+		backlight = <&backlight2>;
+		status = "disabled";
 	};	
 
 	sound-hdmi {
@@ -348,6 +370,12 @@
 	status = "okay";
 };
 
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm1>;
+	status = "okay";
+};
+
 &pwm4 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm4>;
@@ -456,6 +484,12 @@
 		pinctrl_pwm4: pwm4grp {
 			fsl,pins = <
 				MX6QDL_PAD_SD4_DAT2__PWM4_OUT 		0x1b0b1
+			>;
+		};
+		
+		pinctrl_pwm1: pwm1grp {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_9__PWM1_OUT 		0x1b0b1
 			>;
 		};
 	};
