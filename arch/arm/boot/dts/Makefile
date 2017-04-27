@@ -274,6 +274,7 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6-egf-WID0510_AD01.01.dtb \
 	imx6-egf-WID0510_AE01.01.dtb \
 	imx6-egf-WID0510_AF01.01.dtb \
+	imx6-egf-WID0510_AG01.01.dtb \
 	imx6dl-sabreauto.dtb \
 	imx6dl-sabreauto-ecspi.dtb \
 	imx6dl-sabreauto-enetirq.dtb \
