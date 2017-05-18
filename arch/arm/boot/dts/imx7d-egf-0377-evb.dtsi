@@ -109,6 +109,41 @@
 	
 };
 
+&fec2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	
+	clocks = <&clks IMX7D_ENET_AXI_ROOT_CLK>,
+			<&clks IMX7D_ENET_AXI_ROOT_CLK>,
+			<&clks IMX7D_ENET2_TIME_ROOT_CLK>,
+			<&clks IMX7D_PLL_ENET_MAIN_50M_CLK>,
+			<&clks IMX7D_ENET2_REF_ROOT_CLK>;
+	clock-names = "ipg", "ahb", "ptp",
+				"enet_clk_ref", "enet_out";
+	assigned-clocks = <&clks IMX7D_ENET2_TIME_ROOT_SRC>,
+			  <&clks IMX7D_ENET2_TIME_ROOT_CLK>;
+	assigned-clock-parents = <&clks IMX7D_PLL_ENET_MAIN_100M_CLK>;
+	assigned-clock-rates = <0>, <100000000>;
+	
+	phy-mode = "rmii";
+	phy-handle = <&ethphy>;
+	phy-reset-gpios = <&gpio7 14 0>;
+	fsl,magic-packet;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy: ethernet-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			max-speed = <100>;
+			reg = <0>;
+		};
+
+	};
+};
+
 &sai1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
@@ -265,17 +300,8 @@
 
 &iomuxc {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog_1>;
+	pinctrl-0 = <>;
 
-	imx7d-sdb {
-		pinctrl_hog_1: hoggrp-1 {
-			fsl,pins = <
-				MX7D_PAD_ECSPI2_SS0__GPIO4_IO23	0x19 /* BT_REG_ON */
-				MX7D_PAD_EPDC_BDR0__GPIO2_IO28	0x59 /* headphone detect */
-			>;
-		};
-	};
-	
 	pinctrl_pwm2: pwm2grp {
 			fsl,pins = <
 				MX7D_PAD_GPIO1_IO02__PWM2_OUT 		0x1b0b1
