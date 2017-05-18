@@ -15,6 +15,18 @@ config OF_TOUCHSCREEN
 	def_tristate INPUT
 	depends on INPUT && OF
 
+config TOUCHSCREEN_SX8652
+	tristate "SX8652 based touchscreens"
+	depends on SPI_MASTER
+	help
+	  Say Y here if you have a touchscreen interface using the
+	  SX8652 controller, and your board-specific
+
+	  If unsure, say N (but it's safe to say "Y").
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called sx8652.
+
 config TOUCHSCREEN_88PM860X
 	tristate "Marvell 88PM860x touchscreen"
 	depends on MFD_88PM860X
