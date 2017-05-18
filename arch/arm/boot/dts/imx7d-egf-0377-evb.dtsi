@@ -106,7 +106,6 @@
 			sound-dai = <&codec>;
 		};
 	};
-	
 };
 
 &fec2 {
@@ -312,7 +311,15 @@
 		VDDD-supply = <&reg_1v8_audio_dummy>;
 	};
 	
-	
+	usb3503@08 {
+			compatible = "smsc,usb3503";
+			reg = <0x08>;
+			connect-gpios = <&gpio7 13 0>;
+			disabled-ports = <>;
+			intn-gpios = <&gpio5 0 0>;
+			reset-gpios = <&gpio7 12 0>;
+			initial-mode = <1>;
+		};
 };
 
 &iomuxc {
@@ -401,19 +408,6 @@
 	status = "okay";
 };
 
-&usbotg1 {
-	vbus-supply = <&reg_usb_otg1_vbus>;
-	srp-disable;
-	hnp-disable;
-	adp-disable;
-	status = "okay";
-};
-
-&usbotg2 {
-	vbus-supply = <&reg_usb_otg2_vbus>;
-	dr_mode = "host";
-	status = "okay";
-};
 
 &usdhc2 {
 	pinctrl-names = "default";
@@ -471,7 +465,22 @@
 	};
 };
 
+&usbotg1 {
+	vbus-supply = <&reg_usb_otg1_vbus>;
+	srp-disable;
+	hnp-disable;
+	adp-disable;
+	status = "okay";
+};
 
+&usbotg2 {
+	vbus-supply = <&reg_usb_otg2_vbus>;
+	dr_mode = "host";
+	status = "okay";
+};
 
+&usbh {
+	status = "okay";
+};
 
 
