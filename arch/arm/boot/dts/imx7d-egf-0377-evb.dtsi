@@ -187,6 +187,23 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
 	status = "okay";
+	
+	//eeprom factory data (som)
+	24aa64t@50 {
+		compatible = "fsl,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+	
+	tmp102@0x48 {
+		reg = <0x48>;
+		compatible = "ti,tmp102";
+	};
+	
+	rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+	};
 
 	pmic: pfuze3000@08 {
 		compatible = "fsl,pfuze3000";
@@ -349,9 +366,6 @@
 	pinctrl-0 = <&pinctrl_pwm2>;
 	status = "okay";
 };
-
-
-
 
 &uart1 {
 	pinctrl-names = "default";
