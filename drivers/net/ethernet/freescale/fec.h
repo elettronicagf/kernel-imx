@@ -573,6 +573,9 @@ struct fec_enet_private {
 
 	u32 rx_copybreak;
 
+	unsigned int phy_reset_duration;
+	unsigned int phy_reset_gpio;
+
 	/* ptp clock period in ns*/
 	unsigned int ptp_inc;
 
