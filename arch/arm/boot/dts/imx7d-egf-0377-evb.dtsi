@@ -185,6 +185,25 @@
 	status = "okay";
 };
 
+&kpp {
+	status = "okay";
+	linux,keymap = <
+		0x0000003B /*  KEY_F1    */
+		0x0100003C /*  KEY_F2    */
+		0x0200003D /*  KEY_F3    */
+		0x0300003E /*  KEY_F4    */
+		0x00010067 /*  KEY_UP    */
+		0x0301006A /*  KEY_RIGHT */
+		0x02010069 /*  KEY_LEFT  */
+		0x0101006C /*  KEY_DOWN  */
+		0x0002001C /*  KEY_ENTER */
+		0x02030072 /*  KEY_VOLUMEDOWN */
+		0x01030073 /*  KEY_VOLUMEUP   */
+		0x03030074/*  KEY_POWER  */
+	>;	
+	
+};
+
 &i2c1 {
 	clock-frequency = <100000>;
 	pinctrl-names = "default";
