@@ -5,8 +5,9 @@
 
 / {
 	model = "Elettronica GF i.MX7D SOM WIDAB";
+	compatible = "fsl,imx7d-egf", "fsl,imx7d";
+};
 
-	&fec2 {
-		status = "disabled";
-	};
+&fec2 {
+	status = "disabled";
 };

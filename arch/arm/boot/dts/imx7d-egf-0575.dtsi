@@ -14,9 +14,6 @@
 #include "imx7d.dtsi"
 
 / {
-	memory {
-		reg = <0x80000000 0x80000000>;
-	};
 
 	pxp_v4l2_out {
 		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
@@ -28,38 +25,9 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		/* pin SD2-DAT0 */
-		reg_usb_otg1_vbus: regulator@2 {
+		reg_vref_1v8: regulator@0 {
 			compatible = "regulator-fixed";
-			reg = <2>;
-			regulator-name = "usb_otg1_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio5 14 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
-
-		/*  pin USB-OTG1-PWR */
-		reg_usb_otg2_vbus: regulator@3 {
-			compatible = "regulator-fixed";
-			reg = <3>;
-			regulator-name = "usb_otg2_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio4 7 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
-
-		reg_sd2_vmmc: regulator@4 {
-			compatible = "regulator-fixed";
-			regulator-name = "VDD_SD2";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-		};
-
-		reg_vref_1v8: regulator@5 {
-			compatible = "regulator-fixed";
-			reg = <5>;
+			reg = <0>;
 			regulator-name = "vref-1v8";
 			regulator-min-microvolt = <1800000>;
 			regulator-max-microvolt = <1800000>;
@@ -67,22 +35,44 @@
 	};
 };
 
-/* eth1 */
+
 &fec1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_ENET1_TIME_ROOT_SRC>,
+			  <&clks IMX7D_ENET1_TIME_ROOT_CLK>;
+	assigned-clock-parents = <&clks IMX7D_PLL_ENET_MAIN_100M_CLK>;
+	assigned-clock-rates = <0>, <100000000>;
 	phy-mode = "rgmii";
-	phy-reset-gpios = <&gpio6 16 0>;
+	phy-handle = <&ethphy0>;
 	fsl,magic-packet;
 	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy0: ethernet-phy@4 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <4>;
+		};
+
+		ethphy1: ethernet-phy@5 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <5>;
+		};
+	};
 };
 
-/* eth2 */
 &fec2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_ENET2_TIME_ROOT_SRC>,
+			  <&clks IMX7D_ENET2_TIME_ROOT_CLK>;
+	assigned-clock-parents = <&clks IMX7D_PLL_ENET_MAIN_100M_CLK>;
+	assigned-clock-rates = <0>, <100000000>;
 	phy-mode = "rgmii";
-	phy-reset-gpios = <&gpio6 14 0>;
+	phy-handle = <&ethphy1>;
 	fsl,magic-packet;
 	status = "okay";
 };
@@ -101,11 +91,6 @@
 
 &cpu0 {
 	arm-supply = <&sw1a_reg>;
-};
-
-&clks {
-	assigned-clocks = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
-	assigned-clock-rates = <884736000>;
 };
 
 &epxp {
@@ -242,9 +227,18 @@
 	
 	
 		pinctrl_pwm2: pwm2grp {
-				fsl,pins = <
-					MX7D_PAD_GPIO1_IO02__PWM2_OUT 		0x1b0b1
-				>;
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO02__PWM2_OUT 		0x1b0b1
+			>;
+		};
+		
+		pinctrl_uart5: uart5grp {
+			fsl,pins = <
+				MX7D_PAD_GPIO1_IO06__UART5_DCE_RX 0x79
+				MX7D_PAD_GPIO1_IO07__UART5_DCE_TX 0x79
+				MX7D_PAD_GPIO1_IO04__UART5_DCE_CTS 0x79
+				MX7D_PAD_GPIO1_IO05__UART5_DCE_RTS 0x79
+			>;
 		};
 	};
 };
@@ -297,7 +291,7 @@
 /* uart5 */
 &uart5 {
 	pinctrl-names = "default";
-	pinctrl-0 = <>;
+	pinctrl-0 = <&pinctrl_uart5>;
 	assigned-clocks = <&clks IMX7D_UART5_ROOT_SRC>;
 	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
 	fsl,uart-has-rtscts;
@@ -308,20 +302,9 @@
 &gpmi {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
-	status = "enabled";
-	nand-on-flash-bbt;
-};
-
-
-/* emmc */
-&usdhc3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <>;
-	assigned-clocks = <&clks IMX7D_USDHC3_ROOT_CLK>;
-	assigned-clock-rates = <400000000>;
-	bus-width = <8>;
-	non-removable;
 	status = "okay";
+	nand-on-flash-bbt;
+	status = "disabled";
 };
 
 /* spi nor */
@@ -354,28 +337,7 @@
 	};	
 };
 
-&wdog1 {
-	pinctrl-names = "default";
-	pinctrl-0 = <>;
-	fsl,wdog_b;
-};
 
 
-/* usb otg1 */
-&usbotg1 {
-	vbus-supply = <&reg_usb_otg1_vbus>;
-	status = "okay";
-};
-
-/* usb host (otg2) */
-&usbotg2 {
-	vbus-supply = <&reg_usb_otg2_vbus>;
-	dr_mode = "host";
-	status = "okay";
-};
-
-&usbh {
-	status = "okay";
-};
 
 

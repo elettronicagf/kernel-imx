@@ -19,7 +19,7 @@
 / {
 	backlight {
 		compatible = "pwm-backlight";
-		pwms = <&pwm2 0 5000000>;
+		pwms = <&pwm1 0 5000000>;
 		brightness-levels = <0 4 8 16 32 64 128 255>;
 		default-brightness-level = <6>;
 		status = "okay";
@@ -48,9 +48,21 @@
 			regulator-always-on;		
 		};
 
-		reg_usb_otg1_vbus: regulator@2 {
+		/* pin SD2-DAT0 */
+		reg_usb_otg2_vbus: regulator@2 {
 			compatible = "regulator-fixed";
 			reg = <2>;
+			regulator-name = "usb_otg2_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		/*  pin USB-OTG1-PWR */
+		reg_usb_otg1_vbus: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
 			regulator-name = "usb_otg1_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
@@ -58,32 +70,23 @@
 			enable-active-high;
 		};
 
-		reg_usb_otg2_vbus: regulator@3 {
-			compatible = "regulator-fixed";
-			reg = <3>;
-			regulator-name = "usb_otg2_vbus";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			gpio = <&gpio4 7 GPIO_ACTIVE_HIGH>;
-			enable-active-high;
-		};
-
 		reg_sd2_vmmc: regulator@4 {
 			compatible = "regulator-fixed";
+			reg = <4>;
 			regulator-name = "VDD_SD2";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 		};
-
-		reg_vref_1v8: regulator@5 {
+		
+		reg_camera_dummy: regulator@5 {
 			compatible = "regulator-fixed";
 			reg = <5>;
-			regulator-name = "vref-1v8";
-			regulator-min-microvolt = <1800000>;
-			regulator-max-microvolt = <1800000>;
+			regulator-name = "reg-camera-dummy";
+			regulator-min-microvolt = <1500000>;
+			regulator-max-microvolt = <2800000>;
 		};
+		
 	};
-	
 	
 	sound {
 		compatible = "egf,imx7-egf-sgtl5000",
@@ -101,23 +104,155 @@
 			"LINE_IN", "Line In Jack",
 			"Headphone Jack", "HP_OUT";
 		cpu_dai: simple-audio-card,cpu {
-			sound-dai = <&sai1>;
+			sound-dai = <&sai2>;
 		};
-
+ 
 		codec_dai: simple-audio-card,codec {
 			sound-dai = <&codec>;
 		};
 	};
 };
 
-&sai1 {
+&clks {
+	assigned-clocks = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
+	assigned-clock-rates = <884736000>;
+};
+
+&csi1 {
+	csi-mux-mipi = <&gpr 0x14 4>;
+	status = "disabled";
+
+	port {
+		csi_ep: endpoint {
+			remote-endpoint = <&csi_mipi_ep>;
+		};
+	};
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	ov5640_mipi: ov5640_mipi@3c {
+		compatible = "ovti,ov5640_mipi";
+		reg = <0x3c>;
+		clocks = <&clks IMX7D_CLK_DUMMY>;
+		clock-names = "csi_mclk";
+		csi_id = <0>;
+		pwn-gpios = <&gpioexp 6 1>;   /* active low / gpioexp  */
+		rst-gpios = <&gpioexp 7 0>;   /* active high / gpioexp */
+		DOVDD-supply = <&reg_camera_dummy>; /* 1.8v */
+		AVDD-supply = <&reg_camera_dummy>;  /* 2.8v,*/
+		DVDD-supply = <&reg_camera_dummy>;  /* 1.5v */
+		mclk = <24000000>;
+		mclk_source = <0>;
+		status="disabled";
+		port {
+			ov5640_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_sensor_ep>;
+			};
+		};
+	};
+};
+
+&i2c3 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	gpioexp: sx1509@70 {
+		#gpio-cells = <2>;
+		#interrupt-cells = <2>;
+		compatible = "semtech,sx1509q";
+		reg = <0x70>;
+		interrupt-parent = <&gpio5>;
+		interrupts = <16 1>;
+		gpio-controller;
+		reset_during_probe;
+	};
+	
+	rtc@51 {
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+	};
+	
+	codec: sgtl5000@0a {
+		#sound-dai-cells = <0>;
+		compatible = "fsl,sgtl5000";
+		reg = <0x0a>;
+		clocks = <&clks IMX7D_AUDIO_MCLK_ROOT_CLK>;
+		clock-names = "mclk";
+		VDDA-supply = <&reg_audio_dummy>;
+		VDDIO-supply = <&reg_audio_dummy>;
+		VDDD-supply = <&reg_1v8_audio_dummy>;
+	};
+};
+
+&sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
 	#sound-dai-cells = <0>;
-	assigned-clocks = <&clks IMX7D_SAI1_ROOT_SRC>,
-			  <&clks IMX7D_SAI1_ROOT_CLK>;
+	assigned-clocks = <&clks IMX7D_SAI2_ROOT_SRC>,
+			  <&clks IMX7D_SAI2_ROOT_CLK>;
 	assigned-clock-parents = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
 	assigned-clock-rates = <0>, <36864000>;
+	status = "okay";
+};
+
+/* pwm4 */
+&pwm4 {
+	status = "disabled";
+};
+
+/* uSD */
+&usdhc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_USDHC1_ROOT_CLK>;
+	assigned-clock-rates = <400000000>;
+	bus-width = <4>;
+	no-1-8-v;
+	cd-gpios = <&gpio5 0 1>;
+	status = "okay";
+};
+
+/* pci */
+&pcie {
+	status = "okay";
+};
+
+/* camera */
+&mipi_csi {
+	clock-frequency = <240000000>;
+	status = "okay";
+	port {
+		mipi_sensor_ep: endpoint1 {
+			remote-endpoint = <&ov5640_mipi_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+
+		csi_mipi_ep: endpoint2 {
+			remote-endpoint = <&csi_ep>;
+		};
+	};
+};
+
+/* usb otg1 */
+&usbotg1 {
+	vbus-supply = <&reg_usb_otg1_vbus>;
+	status = "okay";
+};
+
+/* usb host (otg2) */
+&usbotg2 {
+	vbus-supply = <&reg_usb_otg2_vbus>;
+	dr_mode = "host";
 	status = "okay";
 };
 
