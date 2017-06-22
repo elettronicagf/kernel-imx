@@ -1,0 +1,381 @@
+/*
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/*
+ * Parti in comune ad entrambi i moduli
+ */
+
+#include <dt-bindings/input/input.h>
+#include "imx7d.dtsi"
+
+/ {
+	memory {
+		reg = <0x80000000 0x80000000>;
+	};
+
+	pxp_v4l2_out {
+		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+		status = "okay";
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/* pin SD2-DAT0 */
+		reg_usb_otg1_vbus: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "usb_otg1_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio5 14 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		/*  pin USB-OTG1-PWR */
+		reg_usb_otg2_vbus: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
+			regulator-name = "usb_otg2_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio4 7 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_sd2_vmmc: regulator@4 {
+			compatible = "regulator-fixed";
+			regulator-name = "VDD_SD2";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+		};
+
+		reg_vref_1v8: regulator@5 {
+			compatible = "regulator-fixed";
+			reg = <5>;
+			regulator-name = "vref-1v8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+		};
+	};
+};
+
+/* eth1 */
+&fec1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	phy-mode = "rgmii";
+	phy-reset-gpios = <&gpio6 16 0>;
+	fsl,magic-packet;
+	status = "okay";
+};
+
+/* eth2 */
+&fec2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	phy-mode = "rgmii";
+	phy-reset-gpios = <&gpio6 14 0>;
+	fsl,magic-packet;
+	status = "okay";
+};
+
+/* adc1 */
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};
+
+/* adc2 */
+&adc2 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};
+
+&cpu0 {
+	arm-supply = <&sw1a_reg>;
+};
+
+&clks {
+	assigned-clocks = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
+	assigned-clock-rates = <884736000>;
+};
+
+&epxp {
+	status = "okay";
+};
+
+/* can1 */
+&flexcan1 {
+	status = "okay";
+};
+
+/* can2 */
+&flexcan2 {
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	//eeprom factory data (som)
+	/* eeprom */
+	24aa64t@50 {
+		compatible = "fsl,24c64";
+		reg = <0x50>;
+		pagesize = <32>;
+	};
+	
+	/* pmic */
+	pmic: pfuze3000@08 {
+		compatible = "fsl,pfuze3000";
+		reg = <0x08>;
+
+		regulators {
+			sw1a_reg: sw1a {
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <6250>;
+			};
+
+			/* use sw1c_reg to align with pfuze100/pfuze200 */
+			sw1c_reg: sw1b {
+				regulator-min-microvolt = <700000>;
+				regulator-max-microvolt = <1475000>;
+				regulator-boot-on;
+				regulator-always-on;
+				regulator-ramp-delay = <6250>;
+			};
+
+			sw2_reg: sw2 {
+				regulator-min-microvolt = <1500000>;
+				regulator-max-microvolt = <1850000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			sw3a_reg: sw3 {
+				regulator-min-microvolt = <900000>;
+				regulator-max-microvolt = <1650000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			swbst_reg: swbst {
+				regulator-min-microvolt = <5000000>;
+				regulator-max-microvolt = <5150000>;
+			};
+
+			snvs_reg: vsnvs {
+				regulator-min-microvolt = <1000000>;
+				regulator-max-microvolt = <3000000>;
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			vref_reg: vrefddr {
+				regulator-boot-on;
+				regulator-always-on;
+			};
+
+			vgen1_reg: vldo1 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			vgen2_reg: vldo2 {
+				regulator-min-microvolt = <800000>;
+				regulator-max-microvolt = <1550000>;
+				regulator-always-on;
+			};
+
+			vgen3_reg: vccsd {
+				regulator-min-microvolt = <2850000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			vgen4_reg: v33 {
+				regulator-min-microvolt = <2850000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			vgen5_reg: vldo3 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+
+			vgen6_reg: vldo4 {
+				regulator-min-microvolt = <1800000>;
+				regulator-max-microvolt = <3300000>;
+				regulator-always-on;
+			};
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	imx7d-egf {
+		pinctrl_hog: hoggrp {
+			fsl,pins = <
+				MX7D_PAD_UART3_TX_DATA__GPIO4_IO5	  0x14
+			>;
+		};
+	
+	
+		pinctrl_pwm2: pwm2grp {
+				fsl,pins = <
+					MX7D_PAD_GPIO1_IO02__PWM2_OUT 		0x1b0b1
+				>;
+		};
+	};
+};
+
+&sdma {
+	status = "okay";
+};
+
+/* pwm1 */
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+};
+
+/* pwm4 */
+&pwm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+};
+
+/* uart1 */
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_UART1_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_OSC_24M_CLK>;
+	status = "okay";
+};
+
+/* uart2 */
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_UART2_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
+	status = "okay";
+};
+
+/* uart3 */
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_UART3_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
+	status = "okay";
+};
+
+/* uart5 */
+&uart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_UART5_ROOT_SRC>;
+	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+/* nand */
+&gpmi {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "enabled";
+	nand-on-flash-bbt;
+};
+
+
+/* emmc */
+&usdhc3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX7D_USDHC3_ROOT_CLK>;
+	assigned-clock-rates = <400000000>;
+	bus-width = <8>;
+	non-removable;
+	status = "okay";
+};
+
+/* spi nor */
+&ecspi2 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio4 23 0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	flash: m25p80@1 {
+		compatible = "sst,s25fl132k";
+		spi-max-frequency = <20000000>;
+		reg = <1>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		mtd0@00000000 {
+			label = "SPL";
+			reg = <0x000000 0x040000>;
+		};
+		mtd1@00040000 {
+			label = "UBOOT";
+			reg = <0x040000 0x100000>;
+		};
+		mtd2@00140000 {
+			label = "DATA";
+			reg = <0x140000 0x2C0000>;
+		};
+
+	};	
+};
+
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	fsl,wdog_b;
+};
+
+
+/* usb otg1 */
+&usbotg1 {
+	vbus-supply = <&reg_usb_otg1_vbus>;
+	status = "okay";
+};
+
+/* usb host (otg2) */
+&usbotg2 {
+	vbus-supply = <&reg_usb_otg2_vbus>;
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usbh {
+	status = "okay";
+};
+
+

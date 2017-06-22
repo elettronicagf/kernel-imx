@@ -1,0 +1,124 @@
+/*
+ * Copyright (C) 2015 Freescale Semiconductor, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+/*
+ * Hardware on evb
+ * gpio port expander SX1509
+ * rtc PCF85063ATL
+ * audio codec SGTL 5000
+ * backlight regulators pwm *2 -> solo pwm1 x backlight
+ * sim card connector
+ * MIPI -> LVDS bridge SN65DSI83
+ */
+
+/ {
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm2 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <6>;
+		status = "okay";
+	};
+
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		reg_audio_dummy: regulator@0 {
+			compatible = "regulator-fixed";
+			reg = <0>;
+			regulator-name = "audio_vdda_vddio";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+		
+		reg_1v8_audio_dummy: regulator@1 {
+			compatible = "regulator-fixed";
+			reg = <1>;
+			regulator-name = "audio_vddd";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			regulator-always-on;		
+		};
+
+		reg_usb_otg1_vbus: regulator@2 {
+			compatible = "regulator-fixed";
+			reg = <2>;
+			regulator-name = "usb_otg1_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio4 5 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_usb_otg2_vbus: regulator@3 {
+			compatible = "regulator-fixed";
+			reg = <3>;
+			regulator-name = "usb_otg2_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			gpio = <&gpio4 7 GPIO_ACTIVE_HIGH>;
+			enable-active-high;
+		};
+
+		reg_sd2_vmmc: regulator@4 {
+			compatible = "regulator-fixed";
+			regulator-name = "VDD_SD2";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+		};
+
+		reg_vref_1v8: regulator@5 {
+			compatible = "regulator-fixed";
+			reg = <5>;
+			regulator-name = "vref-1v8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+		};
+	};
+	
+	
+	sound {
+		compatible = "egf,imx7-egf-sgtl5000",
+			     "simple-audio-card";
+		simple-audio-card,name = "imx7-egf-sgtl5000-audio";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&codec_dai>;
+		simple-audio-card,frame-master = <&codec_dai>;
+		simple-audio-card,widgets =
+			"Headphone", "Headphone Jack",
+			"Line", "Line In Jack",
+			"Microphone", "Mic Jack";
+		simple-audio-card,routing =
+			"MIC_IN", "Mic Jack",
+			"LINE_IN", "Line In Jack",
+			"Headphone Jack", "HP_OUT";
+		cpu_dai: simple-audio-card,cpu {
+			sound-dai = <&sai1>;
+		};
+
+		codec_dai: simple-audio-card,codec {
+			sound-dai = <&codec>;
+		};
+	};
+};
+
+&sai1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	#sound-dai-cells = <0>;
+	assigned-clocks = <&clks IMX7D_SAI1_ROOT_SRC>,
+			  <&clks IMX7D_SAI1_ROOT_CLK>;
+	assigned-clock-parents = <&clks IMX7D_PLL_AUDIO_POST_DIV>;
+	assigned-clock-rates = <0>, <36864000>;
+	status = "okay";
+};
+
+
