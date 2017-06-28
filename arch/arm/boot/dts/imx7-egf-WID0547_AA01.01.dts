@@ -4,7 +4,7 @@
 
 / {
 	model = "Elettronica GF i.MX7D EVB";
-	compatible = "fsl,imx7-egf", "fsl,imx7d";
+	compatible = "fsl,imx7d-egf", "fsl,imx7d";
 	
 	memory {
 		reg = <0x80000000 0x80000000>;

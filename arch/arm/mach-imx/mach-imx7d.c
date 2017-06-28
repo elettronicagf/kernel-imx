@@ -99,15 +99,8 @@ static void __init imx7d_enet_clk_sel(void)
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx7d-iomuxc-gpr");
 	if (!IS_ERR(gpr)) {
-		if(of_machine_is_compatible("fsl,imx7-egf"))
-		{
-			printk(KERN_INFO "EGFEGF enet clk sel 2\n");
-			regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET_TX_CLK_SEL_MASK, 0);
-			regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET2_CLK_DIR_MASK, IMX7D_GPR1_ENET2_CLK_DIR_MASK);
-		} else {
-			regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET_TX_CLK_SEL_MASK, 0);
-			regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET_CLK_DIR_MASK, 0);
-		}
+		regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET_TX_CLK_SEL_MASK, 0);
+		regmap_update_bits(gpr, IOMUXC_GPR1, IMX7D_GPR1_ENET_CLK_DIR_MASK, 0);
 	} else {
 		pr_err("failed to find fsl,imx7d-iomux-gpr regmap\n");
 	}
