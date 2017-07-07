@@ -226,9 +226,16 @@
 		};
 	
 	
-		pinctrl_pwm2: pwm2grp {
+
+	};
+};
+
+
+&iomuxc_lpsr {
+	imx7d-egf {
+		pinctrl_pwm1: pwm1grp {
 			fsl,pins = <
-				MX7D_PAD_GPIO1_IO02__PWM2_OUT 		0x1b0b1
+				MX7D_PAD_GPIO1_IO01__PWM1_OUT 0x30
 			>;
 		};
 		
@@ -250,14 +257,7 @@
 /* pwm1 */
 &pwm1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <>;
-	status = "okay";
-};
-
-/* pwm4 */
-&pwm4 {
-	pinctrl-names = "default";
-	pinctrl-0 = <>;
+	pinctrl-0 = <&pinctrl_pwm1>;
 	status = "okay";
 };
 
