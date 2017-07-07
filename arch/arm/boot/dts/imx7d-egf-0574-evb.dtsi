@@ -227,8 +227,6 @@
 &usdhc1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
-	assigned-clocks = <&clks IMX7D_USDHC1_ROOT_CLK>;
-	assigned-clock-rates = <400000000>;
 	bus-width = <4>;
 	no-1-8-v;
 	cd-gpios = <&gpio5 0 1>;
