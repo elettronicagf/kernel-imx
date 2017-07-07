@@ -68,6 +68,12 @@ static struct mipi_dsi_match_lcd mipi_dsi_lcd_db[] = {
 	 {mipid_hx8363_get_lcd_videomode, mipid_hx8363_lcd_setup}
 	},
 #endif
+#ifdef CONFIG_FB_MXC_MIPI_PANEL_BLC1133
+	{
+	 "EGF-BLC1133",
+	 {mipid_blc1133_get_lcd_videomode, mipid_blc1133_lcd_setup}
+	},
+#endif
 	{
 	"", {NULL, NULL}
 	}

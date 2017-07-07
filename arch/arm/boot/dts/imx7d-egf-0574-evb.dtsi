@@ -86,6 +86,15 @@
 			regulator-max-microvolt = <2800000>;
 		};
 		
+		mipi_dsi_reset: mipi-dsi-reset {
+			compatible = "gpio-reset";
+			/* HACK: We don't have a RESET GPIO but it is required by driver */
+			/* so we chose a not muxed GPIO (GPIO1_IO01 pin is muxed as PWM1) */
+			reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>; 
+			reset-delay-us = <1000>;
+			#reset-cells = <0>;
+		};
+		
 	};
 	
 	sound {
@@ -191,6 +200,13 @@
 	};
 };
 
+&i2c4 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+};
+
 &sai2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <>;
@@ -255,5 +271,49 @@
 	dr_mode = "host";
 	status = "okay";
 };
+
+
+&lcdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	display = <&display0>;
+	disp-dev = "mipi_dsi_samsung";
+	status = "okay";
+
+	display0: display {
+		bits-per-pixel = <24>;
+		bus-width = <24>;
+
+		display-timings {
+			native-mode = <&timing0>;
+			timing0: timing0 {
+			clock-frequency = <51200000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hfront-porch = <160>;
+			hback-porch = <160>;
+			hsync-len = <60>;
+			vback-porch = <23>;
+			vfront-porch = <12>;
+			vsync-len = <10>;
+
+			hsync-active = <0>;
+			vsync-active = <0>;
+			de-active = <1>;
+			pixelclk-active = <0>;
+			};
+		};
+	};
+};
+
+&mipi_dsi {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	lcd_panel = "EGF-BLC1133";
+	resets = <&mipi_dsi_reset>;
+	status = "okay";
+};
+
+
 
 

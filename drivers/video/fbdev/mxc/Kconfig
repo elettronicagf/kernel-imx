@@ -43,6 +43,11 @@ config FB_MXC_TRULY_PANEL_TFT3P5581E
 	depends on FB_MXC_SYNC_PANEL
 	depends on FB_MXC_MIPI_DSI_SAMSUNG
 
+config FB_MXC_MIPI_PANEL_BLC1133
+	tristate "BLC1133 on SN65DSI83 converter"
+	depends on FB_MXC_SYNC_PANEL
+	depends on FB_MXC_MIPI_DSI_SAMSUNG
+	
 config FB_MXC_LDB
 	tristate "MXC LDB"
 	depends on FB_MXC_SYNC_PANEL
