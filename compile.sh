@@ -32,7 +32,7 @@ fi
 
 make $CFG
 
-BUILDVER=$(cat .config | grep LOCALVERSION | awk -F'"' '{print substr($2,2)}')
+BUILDVER=$(cat .config | grep LOCALVERSION | awk -F'"' '{print substr($2,1)}')
 OUTPUTDIR=build/$BUILDVER$BUILD_EXT
 rm -rf $OUTPUTDIR
 mkdir -p $OUTPUTDIR
