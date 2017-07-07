@@ -425,11 +425,16 @@ static inline void ov5640_power_down(int enable)
 	if (pwn_gpio < 0)
 		return;
 
-	if (!enable)
+	if (!enable) {
 		gpio_set_value_cansleep(pwn_gpio, 0);
-	else
+		msleep(50);
+		gpio_set_value_cansleep(rst_gpio, 1);
+		msleep(25);
+	} else {
+		gpio_set_value_cansleep(rst_gpio, 0);
 		gpio_set_value_cansleep(pwn_gpio, 1);
-
+		msleep(50);
+	}
 	msleep(2);
 }
 
@@ -439,22 +444,16 @@ static void ov5640_reset(void)
 		return;
 
 	/* camera reset */
-	gpio_set_value(rst_gpio, 1);
+	gpio_set_value_cansleep(rst_gpio, 0);
 
 	/* camera power dowmn */
-	gpio_set_value(pwn_gpio, 1);
+	gpio_set_value_cansleep(pwn_gpio, 1);
 	msleep(5);
 
-	gpio_set_value(pwn_gpio, 0);
-	msleep(5);
+	gpio_set_value_cansleep(pwn_gpio, 0);
+	msleep(50);
 
-	gpio_set_value(rst_gpio, 0);
-	msleep(1);
-
-	gpio_set_value(rst_gpio, 1);
-	msleep(5);
-
-	gpio_set_value(pwn_gpio, 1);
+	gpio_set_value_cansleep(rst_gpio, 1);
 }
 
 static int ov5640_regulator_enable(struct device *dev)
