@@ -128,7 +128,7 @@
 
 &csi1 {
 	csi-mux-mipi = <&gpr 0x14 4>;
-	status = "disabled";
+	status = "okay";
 
 	port {
 		csi_ep: endpoint {
@@ -146,7 +146,7 @@
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
-		clocks = <&clks IMX7D_CLK_DUMMY>;
+		clocks = <&clks IMX7D_CLKO2_ROOT_SRC>;
 		clock-names = "csi_mclk";
 		csi_id = <0>;
 		pwn-gpios = <&gpioexp 6 1>;   /* active low / gpioexp  */
@@ -156,7 +156,7 @@
 		DVDD-supply = <&reg_camera_dummy>;  /* 1.5v */
 		mclk = <24000000>;
 		mclk_source = <0>;
-		status="disabled";
+		status="okay";
 		port {
 			ov5640_mipi_ep: endpoint {
 				remote-endpoint = <&mipi_sensor_ep>;
