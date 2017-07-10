@@ -85,16 +85,15 @@
 			regulator-min-microvolt = <1500000>;
 			regulator-max-microvolt = <2800000>;
 		};
-		
-		mipi_dsi_reset: mipi-dsi-reset {
-			compatible = "gpio-reset";
-			/* HACK: We don't have a RESET GPIO but it is required by driver */
-			/* so we chose a not muxed GPIO (GPIO1_IO01 pin is muxed as PWM1) */
-			reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>; 
-			reset-delay-us = <1000>;
-			#reset-cells = <0>;
-		};
-		
+	};
+	
+	mipi_dsi_reset: mipi-dsi-reset {
+		compatible = "gpio-reset";
+		/* HACK: We don't have a RESET GPIO but it is required by driver */
+		/* so we chose a not muxed GPIO (GPIO1_IO01 pin is muxed as PWM1) */
+		reset-gpios = <&gpio1 1 GPIO_ACTIVE_LOW>; 
+		reset-delay-us = <1000>;
+		#reset-cells = <0>;
 	};
 	
 	sound {
