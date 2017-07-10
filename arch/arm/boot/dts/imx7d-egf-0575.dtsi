@@ -334,10 +334,10 @@
 	pinctrl-0 = <>;
 	status = "okay";
 	
-	flash: m25p80@1 {
+	flash: m25p80@0 {
 		compatible = "sst,s25fl132k";
 		spi-max-frequency = <20000000>;
-		reg = <1>;
+		reg = <0>;
 		#address-cells = <1>;
 		#size-cells = <1>;
 		mtd0@00000000 {
