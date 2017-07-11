@@ -356,6 +356,11 @@
 	};	
 };
 
+&wdog1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	fsl,wdog_b;
+};
 
 
 
