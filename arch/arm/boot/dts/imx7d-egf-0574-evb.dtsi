@@ -217,6 +217,34 @@
 	status = "okay";
 };
 
+&ecspi1 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio4 19 0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	spidev0: spi@0 {
+		compatible = "egf,0574spidev";
+		reg = <0>;
+		spi-max-frequency = <24000000>;
+	};
+};	
+
+&ecspi4 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio3 3 0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
+	
+	spidev1: spi@0 {
+		compatible = "egf,0574spidev";
+		reg = <0>;
+		spi-max-frequency = <24000000>;
+	};
+};	
+
 /* pwm4 */
 &pwm4 {
 	status = "disabled";
