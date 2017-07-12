@@ -11,3 +11,7 @@
 &fec2 {
 	status = "disabled";
 };
+
+&weim {
+	status = "okay";
+};

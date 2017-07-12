@@ -8,3 +8,11 @@
 	compatible = "fsl,imx7d-egf", "fsl,imx7d";
 	
 };
+
+&fec2 {
+	status = "okay";
+};
+
+&weim {
+	status = "disabled";
+};
