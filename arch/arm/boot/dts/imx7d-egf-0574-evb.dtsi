@@ -339,6 +339,11 @@
 	status = "okay";
 };
 
+&pcie {
+	pinctrl-names = "default";
+	reset-gpio = <&gpioexp 15 0>;
+	status = "okay";
+};
 
 
 
