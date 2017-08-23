@@ -501,7 +501,7 @@
 	status = "okay";
 	
 	chip1: spidev@0 {
-		   compatible = "spidev";
+		   compatible = "egf,0533spidev";
 		   spi-max-frequency = <1000000>;
 		   reg = <0>;
 	};	
