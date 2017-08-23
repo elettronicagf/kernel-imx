@@ -23,6 +23,8 @@
 #include <linux/spi/flash.h>
 #include <linux/mtd/spi-nor.h>
 
+#define MFR_WINBOND 0xEF
+
 /* Define max times to check status register before we give up. */
 #define	MAX_READY_WAIT_JIFFIES	(40 * HZ) /* M25P16 specs 40s max chip erase */
 
@@ -1109,7 +1111,9 @@ int spi_nor_scan(struct spi_nor *nor, const char *name, enum read_mode mode)
 	/* nor protection support for STmicro chips */
 	if (JEDEC_MFR(info) == CFI_MFR_ST  ||
         JEDEC_MFR(info) == CFI_MFR_SST ||
-        JEDEC_MFR(info) == CFI_MFR_AMD) {
+        JEDEC_MFR(info) == CFI_MFR_AMD ||
+		JEDEC_MFR(info) == CFI_MFR_MACRONIX ||
+		JEDEC_MFR(info) == MFR_WINBOND) {
 		nor->flash_lock = stm_lock;
 		nor->flash_unlock = stm_unlock;
 	}

@@ -521,7 +521,7 @@
 	};
 
 	flash: m25p80@1 {
-		compatible = "sst,s25fl132k";
+		compatible = "jedec,spi-nor";
 		spi-max-frequency = <20000000>;
 		reg = <1>;
 		#address-cells = <1>;
