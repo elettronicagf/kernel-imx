@@ -32,7 +32,7 @@
 		compatible = "gpio-keys";
 		power {
 			label = "Power Button";
-			gpios = <&gpio1 19 1>;
+			gpios = <&gpio5 7 1>;
 			linux,code = <KEY_POWER>;
 			gpio-key,wakeup;
 		};
@@ -46,12 +46,23 @@
 		reg_usb_otg_vbus: regulator@0 {
 			compatible = "regulator-fixed";
 			reg = <0>;
-			gpio = <&gpio2 1 0>;
+			gpio = <&gpio2 5 0>;
 			regulator-name = "usb_otg_vbus";
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
-			enable-active-low;
+			enable-active-high;
 		};
+		
+		reg_usb_h1_vbus: regulator@1 {
+			compatible = "regulator-fixed";
+			reg = <1>;
+			gpio = <&gpio2 1 0>;
+			regulator-name = "usb_h1_vbus";
+			regulator-min-microvolt = <5000000>;
+			regulator-max-microvolt = <5000000>;
+			enable-active-high;
+		};
+		
 		
 		reg_lcd_vdd_dummy: regulator@3 {
 			compatible = "regulator-fixed";
@@ -62,14 +73,6 @@
 			regulator-always-on;
 		};
 
-		reg_lcd_bkl_dummy: regulator@4 {
-			compatible = "regulator-fixed";
-			reg = <4>;
-			regulator-name = "lcd_bkl_vdd";
-			regulator-min-microvolt = <5000000>;
-			regulator-max-microvolt = <5000000>;
-			regulator-always-on;
-		};
 		
 		reg_eth_vdd: regulator@5 {
 			compatible = "regulator-fixed";
@@ -109,10 +112,8 @@
 			regulator-max-microvolt = <3300000>;
 			startup-delay-us = <200000>;
 			vin-supply = <&reg_wlan>;
-			gpio = <&gpio1 20 0>;
+			gpio = <&gpio3 19 0>;
 			enable-active-high;
-//			regulator-boot-on;
-//			regulator-always-on;
 		};
 		
 		reg_audio_dummy: regulator@9 {
@@ -133,34 +134,26 @@
 			regulator-always-on;		
 		};
 
-		reg_pb_clr: regulator@11 {
-			compatible = "regulator-fixed";
-			reg = <11>;
-			regulator-name = "pb_clr";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			startup-delay-us = <200000>;
-			gpio = <&gpio5 19 0>;
-			enable-active-high;
-			regulator-always-on;
-		};
 	};
 	
 	mxcfb1: fb@0 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "hdmi";
+		interface_pix_fmt = "RGB24";
+		mode_str ="1920x1080M@60";
+		default_bpp = <24>;
+		int_clk = <0>;
+		late_init = <0>;
+		status = "okay";
+	};
+	
+	mxcfb2: fb@1 {
 		compatible = "fsl,mxc_sdc_fb";
 		disp_dev = "ldb";
 		interface_pix_fmt = "RGB666";
 		default_bpp = <18>;
 		int_clk = <0>;
 		late_init = <0>;
-		status = "okay";
-	};
-	
-	backlight: backlight {
-		compatible = "pwm-backlight";
-		pwms = <&pwm3 0 50000>;
-		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
-		default-brightness-level = <11>;
 		status = "okay";
 	};
 	
@@ -190,13 +183,39 @@
 		mux-int-port = <1>;
 		mux-ext-port = <5>;
 	};
+	
+	sound-hdmi {
+		compatible = "fsl,imx6q-audio-hdmi",
+			     "fsl,imx-audio-hdmi";
+		model = "imx-audio-hdmi";
+		hdmi-controller = <&hdmi_audio>;
+	};
+
+	sound-spdif {
+		compatible = "fsl,imx-audio-spdif",
+			   "fsl,imx-egf-spdif";
+		model = "imx-spdif";
+		spdif-controller = <&spdif>;
+		spdif-in;
+		spdif-out;
+	};
 
 	leds {
 		compatible = "gpio-leds";
-		power_on_led {
-			label = "Power On LED";
-			gpios = <&gpio5 21 0>;
+		led_blue {
+			label = "UserLEDBlue";
+			gpios = <&gpio5 4 0>;
 			linux,default-trigger = "heartbeat";
+		};
+		led_red {
+			label = "UserLEDRed";
+			gpios = <&gpio3 5 0>;
+			linux,default-trigger = "none";
+		};
+		led_green {
+			label = "UserLEDGreen";
+			gpios = <&gpio3 4 0>;
+			linux,default-trigger = "none";
 		};
 	};
 	
@@ -234,6 +253,44 @@
 	status = "okay";
 };
 
+&dcic1 {
+	dcic_id = <0>;
+	dcic_mux = "dcic-hdmi";
+	status = "okay";
+};
+
+&hdmi_audio {
+	status = "okay";
+};
+
+&hdmi_cec {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hdmi_cec>;
+	status = "okay";
+};
+
+&hdmi_core {
+	ipu_id = <0>;
+	disp_id = <1>;
+	status = "okay";
+};
+
+&hdmi_video {
+	fsl,phy_reg_vlev = <0x0294>;
+	fsl,phy_reg_cksymtx = <0x800d>;
+	status = "okay";
+};
+
+&spdif {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	assigned-clocks = <&clks IMX6QDL_CLK_SPDIF_SEL>,
+			  <&clks IMX6QDL_CLK_SPDIF_PODF>;
+	assigned-clock-parents = <&clks IMX6QDL_CLK_PLL3_PFD3_454M>;
+	assigned-clock-rates = <0>, <227368421>;
+	status = "okay";
+};
+
 &ldb {
 	status = "okay";
 	enable-active-high;
@@ -266,13 +323,11 @@
 	status = "okay";
 };
 
-&pwm3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pwm3>;
+&pwm1 {
 	status = "okay";
 };
 
-&pwm1 {
+&pwm2 {
 	status = "okay";
 };
 
@@ -289,30 +344,6 @@
 &iomuxc {
 	pinctrl-names = "default";
 	imx6q-egf {
-			pinctrl_usdhc2: usdhc2grp {
-			fsl,pins = <
-				MX6QDL_PAD_SD2_CMD__SD2_CMD			0x17059
-				MX6QDL_PAD_SD2_CLK__SD2_CLK			0x10069
-				MX6QDL_PAD_SD2_DAT0__SD2_DATA0		0x17059
-				MX6QDL_PAD_SD2_DAT1__SD2_DATA1		0x17059
-				MX6QDL_PAD_SD2_DAT2__SD2_DATA2		0x17059
-				MX6QDL_PAD_SD2_DAT3__SD2_DATA3		0x17059
-			>;
-		};
-			pinctrl_usdhc3: usdhc3grp {
-			fsl,pins = <
-				MX6QDL_PAD_SD3_CMD__SD3_CMD			0x17059
-				MX6QDL_PAD_SD3_CLK__SD3_CLK			0x10059
-				MX6QDL_PAD_SD3_DAT0__SD3_DATA0		0x17059
-				MX6QDL_PAD_SD3_DAT1__SD3_DATA1		0x17059
-				MX6QDL_PAD_SD3_DAT2__SD3_DATA2		0x17059
-				MX6QDL_PAD_SD3_DAT3__SD3_DATA3		0x17059
-				MX6QDL_PAD_SD3_DAT4__SD3_DATA4		0x17059
-				MX6QDL_PAD_SD3_DAT5__SD3_DATA5		0x17059
-				MX6QDL_PAD_SD3_DAT6__SD3_DATA6		0x17059
-				MX6QDL_PAD_SD3_DAT7__SD3_DATA7		0x17059
-			>;
-		};
 		pinctrl_hdmi_cec: hdmicecgrp {
 			fsl,pins = <
 				MX6QDL_PAD_KEY_ROW2__HDMI_TX_CEC_LINE 0x1f8b0
@@ -338,11 +369,6 @@
 				MX6QDL_PAD_RGMII_RD2__RGMII_RD2		0x1b0b0
 				MX6QDL_PAD_RGMII_RD3__RGMII_RD3		0x1b0b0
 				MX6QDL_PAD_RGMII_RX_CTL__RGMII_RX_CTL	0x1b0b0
-			>;
-		};
-		pinctrl_pwm3: pwm3grp {
-			fsl,pins = <
-				MX6QDL_PAD_SD4_DAT1__PWM3_OUT 		0x1b0b1
 			>;
 		};
 	};
@@ -375,6 +401,28 @@
 	};
 };
 
+&ecspi3 {
+	fsl,spi-num-chipselects = <4>;
+	cs-gpios = <
+		&gpio4 24 0
+		&gpio4 25 0
+		&gpio4 26 0
+		&gpio4 27 0
+	>;
+	status = "okay";
+	
+	spidev0: spi@2 {
+		compatible = "egf,0556spidev";
+		reg = <2>;
+		spi-max-frequency = <24000000>;
+	};
+	spidev1: spi@3 {
+		compatible = "egf,0556spidev";
+		reg = <3>;
+		spi-max-frequency = <24000000>;
+	};
+};
+
 &i2c1 {
 	clock-frequency = <100000>;
 	status = "okay";
@@ -401,11 +449,20 @@
 		pagesize = <32>;
 	};
 	
-	// The MCP3021 is 100kHz clock only */
-	batt_adc: mcp3021@4d {
-		compatible = "microchip,mcp3021";
-		reg = <0x4d>;
-	};	
+	ov5640_mipi: ov5640_mipi@3c { /* i2c2 driver */
+		compatible = "ovti,ov564x_mipi";
+		reg = <0x3c>;
+		clocks = <&clks 201>;
+		clock-names = "csi_mclk";
+		DOVDD-supply = <&reg_camera_dummy>; /* 1.8v */
+		AVDD-supply = <&reg_camera_dummy>;  /* 2.8v,*/
+		DVDD-supply = <&reg_camera_dummy>;  /* 1.5v */
+		pwn-gpios = <&gpio2 8 1>;   /* active low   */
+		rst-gpios = <&gpio2 11 0>;   /* active high */
+		csi_id = <0>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+	};
 	
 };
 
@@ -523,25 +580,14 @@
 	clock-frequency = <100000>;
 	status = "okay";
 	
-	ov5640_mipi: ov5640_mipi@3c { /* i2c2 driver */
-		compatible = "ovti,ov564x_mipi";
-		reg = <0x3c>;
-		clocks = <&clks 201>;
-		clock-names = "csi_mclk";
-		DOVDD-supply = <&reg_camera_dummy>; /* 1.8v */
-		AVDD-supply = <&reg_camera_dummy>;  /* 2.8v,*/
-		DVDD-supply = <&reg_camera_dummy>;  /* 1.5v */
-		pwn-gpios = <&gpio2 8 1>;   /* active low   */
-		rst-gpios = <&gpio2 11 0>;   /* active high */
-		csi_id = <0>;
-		mclk = <24000000>;
-		mclk_source = <0>;
+	hdmi: edid@50 {
+		compatible = "fsl,imx6-hdmi-i2c";
+		reg = <0x50>;
 	};
 };
 
-// UART1 - 4 fili 
+// UART1 - 2 fili 
 &uart1 {
-	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
@@ -557,10 +603,30 @@
 	status = "okay";
 };
 
+// UART4 - 2 fili 
+&uart4 {
+	status = "okay";
+};
+
+// UART5 - 2 fili 
+&uart5 {
+	status = "okay";
+};
+
+// microSD
+&usdhc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	bus-width = <4>;
+	no-1-8-v;
+	cd-gpios = <&gpio6 8 1>;
+	status = "okay";
+};
+
 //eMMC Flash Interna
 &usdhc2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-0 = <>;
 	bus-width = <4>;
 	non-removable;
 	no-1-8-v;
@@ -583,7 +649,7 @@
 //eMMC Flash Interna
 &usdhc3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-0 = <>;
 	bus-width = <8>;
 	non-removable;
 	no-1-8-v;
@@ -607,6 +673,11 @@
 	adp-disable;
 	status = "okay";
 
+};
+
+&usbh1 {
+	vbus-supply = <&reg_usb_h1_vbus>;
+	status = "okay";
 };
 
 &mipi_csi {
