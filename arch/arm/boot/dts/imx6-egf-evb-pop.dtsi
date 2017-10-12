@@ -411,6 +411,23 @@
 	>;
 	status = "okay";
 	
+	sx8652@0 {
+		compatible = "semtech,sx8652";
+		interrupt-parent = <&gpio6>;   //GPIO6_IO0
+		interrupts = <0 2>;
+		spi-max-frequency = <1000000>;
+		reg = <0>;
+		x-min = /bits/ 16 <150>;
+		x-max = /bits/ 16 <3830>;
+		y-min = /bits/ 16 <190>;
+		y-max = /bits/ 16 <3830>;
+		x-plate-ohms = /bits/ 16 <450>;
+		y-plate-ohms = /bits/ 16 <250>;
+		pressure-max = /bits/ 16 <500>;
+		pendown-gpio = <&gpio6 0 1>;
+		ts-wires = /bits/ 8 <4>;
+	};
+	
 	spidev0: spi@2 {
 		compatible = "egf,0556spidev";
 		reg = <2>;
