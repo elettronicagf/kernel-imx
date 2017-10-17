@@ -16,4 +16,8 @@
 / {
 	model = "Elettronica GF - i.MX6D 0541";
 	compatible = "egf,imx6q-egf","fsl,imx6q"; 
+
+	memory: memory {
+		reg = <0x10000000 0x40000000>;
+	};
 };

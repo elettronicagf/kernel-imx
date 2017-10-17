@@ -14,10 +14,10 @@
 #include "imx6-egf-evb-pop.dtsi"
 
 / {
-	model = "Elettronica GF - i.MX6Q 0541";
+	model = "Elettronica GF - i.MX6Q 0541 2GB";
 	compatible = "egf,imx6q-egf","fsl,imx6q"; 
 	
 	memory: memory {
-		reg = <0x10000000 0x40000000>;
+		reg = <0x10000000 0x80000000>;
 	};
 };
