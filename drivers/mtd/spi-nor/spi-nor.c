@@ -388,12 +388,15 @@ erase_err:
 static int stm_lock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 {
 	uint8_t status_old, status_new;
-
+	int ret;
+	
 	status_old = read_sr(nor);
 
 	status_new = status_old | (SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
 	write_enable(nor);
-	return write_sr(nor, status_new);
+	ret = write_sr(nor, status_new);
+	spi_nor_wait_till_ready(nor);
+	return ret;
 }
 
 static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
@@ -406,7 +409,7 @@ static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 	status_new = status_old & ~(SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
 	write_enable(nor);
 	ret = write_sr(nor, status_new);
-
+	spi_nor_wait_till_ready(nor);
 	return ret;
 }
 
