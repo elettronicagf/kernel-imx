@@ -15,6 +15,7 @@
 / {
 	aliases {
 		mxcfb0 = &mxcfb1;
+		mxcfb1 = &mxcfb2;
 		lvds_channel0 = &lvds_channel0;
 		lvds_channel0_timings = &lvds_channel0_timings;
 		EGF_BLC1093 = &EGF_BLC1093;
@@ -131,12 +132,11 @@
 		};
 
 	};
-	
+
 	mxcfb1: fb@0 {
 		compatible = "fsl,mxc_sdc_fb";
-		disp_dev = "hdmi";
+		disp_dev = "ldb";
 		interface_pix_fmt = "RGB24";
-		mode_str ="1920x1080M@60";
 		default_bpp = <24>;
 		int_clk = <0>;
 		late_init = <0>;
@@ -145,9 +145,10 @@
 	
 	mxcfb2: fb@1 {
 		compatible = "fsl,mxc_sdc_fb";
-		disp_dev = "ldb";
-		interface_pix_fmt = "RGB666";
-		default_bpp = <18>;
+		disp_dev = "hdmi";
+		interface_pix_fmt = "RGB24";
+		default_bpp = <24>;
+		mode_str="1920x1080M@60";
 		int_clk = <0>;
 		late_init = <0>;
 		status = "okay";
@@ -287,13 +288,17 @@
 	status = "okay";
 };
 
+&clks {
+        fsl,ldb-di0-parent = <&clks IMX6QDL_CLK_PLL5_VIDEO_DIV>;
+};
+
 &ldb {
 	status = "okay";
 	enable-active-high;
 
 	lvds_channel0: lvds-channel@0 {
 		fsl,data-mapping = "spwg";
-		fsl,data-width = <18>;
+		fsl,data-width = <24>;
 		crtc = "ipu1-di0";
 		status = "okay";
 		primary;
@@ -301,15 +306,15 @@
 		lvds_channel0_timings: display-timings {
 			native-mode = <&EGF_BLC1093>;
 			EGF_BLC1093: kwh070kq13-f02 {
-				clock-frequency = <40000000>;
-				hactive = <800>;
-				vactive = <480>;
-				hback-porch = <45>;
-				hfront-porch = <210>;
-				vback-porch = <22>;
-				vfront-porch = <132>;
-				hsync-len = <1>;
-				vsync-len = <1>;
+				clock-frequency = <12000000>;
+				hactive = <480>;
+				vactive = <272>;
+				hback-porch = <102>;
+				hfront-porch = <30>;
+				vback-porch = <20>;
+				vfront-porch = <10>;
+				hsync-len = <30>;
+				vsync-len = <3>;
 			};
 		};
 	};
