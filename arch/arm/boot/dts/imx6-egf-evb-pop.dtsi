@@ -417,8 +417,8 @@
 		x-max = /bits/ 16 <3830>;
 		y-min = /bits/ 16 <190>;
 		y-max = /bits/ 16 <3830>;
-		x-plate-ohms = /bits/ 16 <450>;
-		y-plate-ohms = /bits/ 16 <250>;
+		x-plate-ohms = /bits/ 16 <775>;
+		y-plate-ohms = /bits/ 16 <170>;
 		pressure-max = /bits/ 16 <500>;
 		pendown-gpio = <&gpio6 0 1>;
 		ts-wires = /bits/ 8 <4>;
