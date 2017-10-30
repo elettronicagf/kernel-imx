@@ -5,7 +5,7 @@ message() {
 compile_dts() {
 
 rm -rf arch/arm/boot/dts/imx6-egf-WID$1.dtb
-make ARCH=arm CROSS_COMPILE=arm-egf-linux-gnueabi- imx6-egf-WID$1.dtb
+make ARCH=arm imx6-egf-WID$1.dtb
 if [ -z arch/arm/boot/dts/imx6-egf-WID$1.dtb ]; then
 	message "DTB missing!"
 	exit
@@ -13,6 +13,10 @@ fi
 cp arch/arm/boot/dts/imx6-egf-WID$1.dtb $2
 } 
 
+export CROSS_COMPILE=/opt/0556_evb_pop/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi/arm-poky-linux-gnueabi-
+export KCFLAGS=--sysroot=/opt/0556_evb_pop/sysroots/cortexa9hf-vfp-neon-poky-linux-gnueabi
+export KCPPFLAGS=
+export KAFLAGS=
 
 if [ "$1" = "update" ];
 then
@@ -24,7 +28,7 @@ else
      BUILD_EXT=""
 fi
 
-make ARCH=arm CROSS_COMPILE=arm-egf-linux-gnueabi- $CFG
+make ARCH=arm $CFG
 
 BUILDVER=$(cat .config | grep LOCALVERSION | awk -F'"' '{print substr($2,2)}')
 OUTPUTDIR=build/$BUILDVER$BUILD_EXT
@@ -36,7 +40,7 @@ mkdir -p $OUTPUTDIR
 
 rm -rf arch/arm/boot/zImage
 
-make ARCH=arm CROSS_COMPILE=arm-egf-linux-gnueabi- -j4 zImage
+make ARCH=arm -j4 zImage
 if [ -z arch/arm/boot/zImage ]; then
 	message "zImage missing!"
 	exit
@@ -49,9 +53,13 @@ compile_dts 0500_AC01.01 $OUTPUTDIR
 cp arch/arm/boot/zImage $OUTPUTDIR
 
 if [ ! "$1" = "update" ]; then
-	make ARCH=arm CROSS_COMPILE=arm-egf-linux-gnueabi- -j4 modules INSTALL_MOD_PATH=./build/modules
-	make ARCH=arm CROSS_COMPILE=arm-egf-linux-gnueabi- -j4 modules_install INSTALL_MOD_PATH=./build/modules
-
+	KERNEL_DIR=$(pwd)
+	cd compat_wireless
+	make ARCH=arm defconfig-wl18xx
+	make ARCH=arm KLIB_BUILD=$KERNEL_DIR -j8
+	make ARCH=arm KLIB_BUILD=$KERNEL_DIR -j8 modules INSTALL_MOD_PATH=build/modules
+	make ARCH=arm KLIB_BUILD=$KERNEL_DIR -j8 modules_install INSTALL_MOD_PATH=build/modules
+	cd ..
 	mkdir -p $OUTPUTDIR/modules_$BUILDVER
 	rm -rf $OUTPUTDIR/modules_$BUILDVER/*
 	find build/modules/ -name "*.ko" -exec cp {} $OUTPUTDIR/modules_$BUILDVER/ \;
