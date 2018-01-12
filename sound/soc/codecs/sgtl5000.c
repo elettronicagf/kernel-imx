@@ -1410,11 +1410,19 @@ static const struct regmap_config sgtl5000_regmap = {
 static int sgtl5000_fill_defaults(struct sgtl5000_priv *sgtl5000)
 {
 	int i, ret, val, index;
+	int reg;
 
 	for (i = 0; i < ARRAY_SIZE(sgtl5000_reg_defaults); i++) {
 		val = sgtl5000_reg_defaults[i].def;
 		index = sgtl5000_reg_defaults[i].reg;
-		ret = regmap_write(sgtl5000->regmap, index, val);
+		ret = regmap_read(sgtl5000->regmap, index, &reg);
+		if (ret) {
+			printk(KERN_WARNING "SGTL5000 probe read failed at %i\n", i);
+			return ret;
+		}
+		if (reg != val) {
+			ret = regmap_write(sgtl5000->regmap, index, val);
+		}
 		if (ret)
 			return ret;
 	}
@@ -1518,20 +1526,23 @@ static int sgtl5000_i2c_probe(struct i2c_client *client,
 
 	i2c_set_clientdata(client, sgtl5000);
 
+	printk(KERN_INFO "Fill defaults\n");
 	/* Ensure sgtl5000 will start with sane register values */
 	ret = sgtl5000_fill_defaults(sgtl5000);
 	if (ret)
 		goto disable_clk;
+	printk(KERN_INFO "Fill defaults done\n");
 
 	ret = snd_soc_register_codec(&client->dev,
 			&sgtl5000_driver, &sgtl5000_dai, 1);
 	if (ret)
 		goto disable_clk;
+	printk(KERN_INFO "Registered codec\n");
 
 	return 0;
 
 disable_clk:
-	clk_disable_unprepare(sgtl5000->mclk);
+	//clk_disable_unprepare(sgtl5000->mclk);
 	return ret;
 }
 
