@@ -1410,13 +1410,22 @@ static const struct regmap_config sgtl5000_regmap = {
 static int sgtl5000_fill_defaults(struct sgtl5000_priv *sgtl5000)
 {
 	int i, ret, val, index;
+	int reg;
 
 	for (i = 0; i < ARRAY_SIZE(sgtl5000_reg_defaults); i++) {
 		val = sgtl5000_reg_defaults[i].def;
 		index = sgtl5000_reg_defaults[i].reg;
-		ret = regmap_write(sgtl5000->regmap, index, val);
-		if (ret)
+		ret = regmap_read(sgtl5000->regmap, index, &reg);
+		if (ret) {
+			printk(KERN_WARNING "SGTL5000 probe read failed at %i\n", i);
 			return ret;
+		}
+		if (reg != val) {
+			ret = regmap_write(sgtl5000->regmap, index, val);
+			if (ret)
+				return ret;
+		}
+
 	}
 
 	return 0;
