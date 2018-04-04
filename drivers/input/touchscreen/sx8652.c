@@ -176,8 +176,8 @@ static int setup_pendown(struct spi_device *spi, struct sx8652 *ts, const struct
 	if (pdata->get_pendown_state) {
 		ts->get_pendown_state = pdata->get_pendown_state;
 	} else if (gpio_is_valid(pdata->gpio_pendown)) {
-		err = gpio_request_one(pdata->gpio_pendown, GPIOF_IN,
-				       "sx8652_pendown");
+		err = devm_gpio_request(&spi->dev, pdata->gpio_pendown,
+				"sx8652_pendown");
 		if (err) {
 			dev_err(&spi->dev,
 				"failed to request/setup pendown GPIO%d: %d\n",
@@ -400,7 +400,9 @@ static int sx8652_probe(struct spi_device *spi)
 	ts->input = input_dev;
 
 	if(gpio_is_valid(pdata->gpio_reset)){
-		gpio_request_one(pdata->gpio_reset, 0, "sx8652_reset");
+
+		devm_gpio_request(&spi->dev, pdata->gpio_reset,
+				"sx8652_reset");
 		gpio_set_value(pdata->gpio_reset,0);
 		udelay(150);
 		gpio_set_value(pdata->gpio_reset,1);
