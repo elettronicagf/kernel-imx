@@ -271,12 +271,18 @@ dtb-$(CONFIG_SOC_IMX6Q) += \
 	imx6-egf-WID0510_AA01.01.dtb \
 	imx6-egf-WID0510_AB01.01.dtb \
 	imx6-egf-WID0510_AC01.01.dtb \
+	imx6-egf-WID0510_AC01.02.dtb \
 	imx6-egf-WID0510_AD01.01.dtb \
 	imx6-egf-WID0510_AE01.01.dtb \
+	imx6-egf-WID0510_AE01.02.dtb \
 	imx6-egf-WID0510_AF01.01.dtb \
+	imx6-egf-WID0510_AF01.02.dtb \
 	imx6-egf-WID0510_AG01.01.dtb \
+	imx6-egf-WID0510_AG01.02.dtb \
 	imx6-egf-WID0510_AJ01.01.dtb \
+	imx6-egf-WID0510_AJ01.02.dtb \
 	imx6-egf-WID0510_AK01.01.dtb \
+	imx6-egf-WID0510_AK01.02.dtb \
 	imx6dl-sabreauto.dtb \
 	imx6dl-sabreauto-ecspi.dtb \
 	imx6dl-sabreauto-enetirq.dtb \

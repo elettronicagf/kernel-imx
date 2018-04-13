@@ -1,0 +1,23 @@
+/*
+ * Copyright 2013 Freescale Semiconductor, Inc.
+ *
+ * Author: Fabio Estevam <fabio.estevam@freescale.com>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ */
+
+/dts-v1/;
+#include "imx6dl.dtsi"
+#include "imx6-egf-panel-pc.dtsi"
+
+/ {
+	model = "Elettronica GF - i.MX6Solo 0533";
+	compatible = "egf,imx6dl-egf","fsl,imx6dl";
+};
+
+&epdc {
+	status = "disabled";
+};
