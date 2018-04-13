@@ -5,7 +5,7 @@ message() {
 compile_dts() {
 
 rm -rf arch/arm/boot/dts/imx6-egf-WID$1.dtb
-make ARCH=arm CROSS_COMPILE=arm-poky-linux-gnueabi- imx6-egf-WID$1.dtb
+make ARCH=arm imx6-egf-WID$1.dtb
 if [ -z arch/arm/boot/dts/imx6-egf-WID$1.dtb ]; then
 	message "DTB missing!"
 	exit
@@ -24,7 +24,8 @@ else
      BUILD_EXT=""
 fi
 
-make ARCH=arm CROSS_COMPILE=arm-poky-linux-gnueabi- $CFG
+export CROSS_COMPILE=/opt/fsl-imx-x11/4.1.15-1.2.0/sysroots/x86_64-pokysdk-linux/usr/bin/arm-poky-linux-gnueabi/arm-poky-linux-gnueabi-
+make ARCH=arm $CFG
 
 BUILDVER=$(cat .config | grep LOCALVERSION | awk -F'"' '{print substr($2,2)}')
 OUTPUTDIR=build/$BUILDVER$BUILD_EXT
@@ -36,7 +37,7 @@ mkdir -p $OUTPUTDIR
 
 rm -rf arch/arm/boot/zImage
 
-make ARCH=arm CROSS_COMPILE=arm-poky-linux-gnueabi- -j4 zImage
+make ARCH=arm -j4 zImage
 if [ -z arch/arm/boot/zImage ]; then
 	message "zImage missing!"
 	exit
@@ -61,8 +62,8 @@ compile_dts 0510_AK01.02 $OUTPUTDIR
 cp arch/arm/boot/zImage $OUTPUTDIR
 
 if [ ! "$1" = "update" ]; then
-	make ARCH=arm CROSS_COMPILE=arm-poky-linux-gnueabi- -j4 modules INSTALL_MOD_PATH=./build/modules
-	make ARCH=arm CROSS_COMPILE=arm-poky-linux-gnueabi- -j4 modules_install INSTALL_MOD_PATH=./build/modules
+	make ARCH=arm -j4 modules INSTALL_MOD_PATH=./build/modules
+	make ARCH=arm -j4 modules_install INSTALL_MOD_PATH=./build/modules
 
 	mkdir -p $OUTPUTDIR/modules_$BUILDVER
 	rm -rf $OUTPUTDIR/modules_$BUILDVER/*
