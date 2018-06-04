@@ -414,9 +414,10 @@ static int stm_lock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 				(status_old & (SR_BP2 | SR_BP1 | SR_BP0))) {
 		write_enable(nor);
 		ret = write_sr(nor, status_new);
+		if (ret)
+			return ret;
 	}
-
-	return ret;
+	return spi_nor_wait_till_ready(nor);
 }
 
 static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
@@ -448,9 +449,10 @@ static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 				(status_old & (SR_BP2 | SR_BP1 | SR_BP0))) {
 		write_enable(nor);
 		ret = write_sr(nor, status_new);
+		if (ret)
+			return ret;
 	}
-
-	return ret;
+	return spi_nor_wait_till_ready(nor);
 }
 
 static int spi_nor_lock(struct mtd_info *mtd, loff_t ofs, uint64_t len)
