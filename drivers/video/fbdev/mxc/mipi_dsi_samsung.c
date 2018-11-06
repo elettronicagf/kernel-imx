@@ -475,6 +475,18 @@ static int mipi_dsi_master_init(struct mipi_dsi_info *mipi_dsi,
 			MIPI_DSI_M_THSZEROCTL(3) |
 			MIPI_DSI_M_THSTRAILCTL(3),
 			mipi_dsi->mmio_base + MIPI_DSI_PHYTIMING2);
+	} else if (!strcmp(mipi_dsi->lcd_panel, "EGF-BLC1133")) {
+		writel(MIPI_DSI_M_TLPXCTL(11) | MIPI_DSI_M_THSEXITCTL(18),
+			mipi_dsi->mmio_base + MIPI_DSI_PHYTIMING);
+		writel(MIPI_DSI_M_TCLKPRPRCTL(13) |
+			MIPI_DSI_M_TCLKZEROCTL(65) |
+			MIPI_DSI_M_TCLKPOSTCTL(17) |
+			MIPI_DSI_M_TCLKTRAILCTL(13),
+			mipi_dsi->mmio_base + MIPI_DSI_PHYTIMING1);
+		writel(MIPI_DSI_M_THSPRPRCTL(7) |
+			MIPI_DSI_M_THSZEROCTL(24) |
+			MIPI_DSI_M_THSTRAILCTL(16),
+			mipi_dsi->mmio_base + MIPI_DSI_PHYTIMING2);
 	} else {
 		writel(MIPI_DSI_M_TLPXCTL(11) | MIPI_DSI_M_THSEXITCTL(18),
 			mipi_dsi->mmio_base + MIPI_DSI_PHYTIMING);
