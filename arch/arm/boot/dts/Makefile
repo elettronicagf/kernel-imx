@@ -434,6 +434,7 @@ dtb-$(CONFIG_SOC_IMX6SLL) += \
 dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7-egf-WID0547_AA01.01.dtb \
 	imx7d-egf-WID0575_AA01.01.dtb \
+	imx7d-egf-WID0575_AA01.02.dtb \
 	imx7d-egf-WID0575_AB01.01.dtb \
 	imx7d-12x12-lpddr3-arm2.dtb \
 	imx7d-12x12-lpddr3-arm2-m4.dtb \

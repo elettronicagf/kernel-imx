@@ -50,6 +50,7 @@ fi
 
 compile_dts 0575_AA01.01 $OUTPUTDIR
 compile_dts 0575_AB01.01 $OUTPUTDIR
+compile_dts 0575_AA01.02 $OUTPUTDIR
 
 cp arch/arm/boot/zImage $OUTPUTDIR
 
