@@ -16,18 +16,36 @@
 	aliases {
 		mxcfb0 = &mxcfb1;
 		mxcfb1 = &mxcfb2;
+		mxcfb2 = &mxcfb3;
+		hdmi_core = &hdmi_core;
+		hdmi_video = &hdmi_video;
+		hdmi_cec = &hdmi_cec;
+		hdmi_audio = &hdmi_audio;
 		lvds_channel1 = &lvds_channel1;
 		lvds_channel1_timings = &lvds_channel1_timings;
-		EGF_BLC1136 = &EGF_BLC1136;
+		lvds_channel2 = &lvds_channel2;
 		EGF_BLC1134 = &EGF_BLC1134;
 		EGF_BLC1133 = &EGF_BLC1133;
-		EGF_BLC1135 = &EGF_BLC1135;
+		EGF_BLC1168 = &EGF_BLC1168;
+		EGF_BLC1167 = &EGF_BLC1167;
+		EGF_BLC1173 = &EGF_BLC1173;
 		backlight1 = &backlight1;
 		backlight2 = &backlight2;
+		backlight3 = &backlight3;
 		panel1 = &panel1;
 		panel2 = &panel2;
+		panel3 = &panel3;
+		panel4 = &panel4;
+		panel5 = &panel5;
 		ft5x06 = &ft5x06;
 		ar1020 = &ar1020;
+		tsc2046 = &tsc2046;
+		sound = &sound;
+		rtc_pcf85063a = &rtc_pcf85063a;
+		rtc_mcp7941x = &rtc_mcp7941x;
+		rtc_mcp7941x_eeprom = &rtc_mcp7941x_eeprom;
+		wdog1 = &wdog1;
+		wdog2 = &wdog2;
 	};
 
 	chosen {
@@ -165,14 +183,24 @@
 		late_init = <0>;
 		status = "okay";
 	};
-		
+	
+	mxcfb3: fb@2 {
+		compatible = "fsl,mxc_sdc_fb";
+		disp_dev = "ldb";
+		interface_pix_fmt = "RGB24";
+		default_bpp = <24>;
+		int_clk = <0>;
+		late_init = <0>;
+		status = "disabled";
+	};
+	
 	backlight1: backlight1 {
 		compatible = "pwm-backlight";
 		pwms = <&pwm4 0 50000>;
 		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
 		default-brightness-level = <11>;
 		enable-gpios = <&gpio3 8 0>;
-		status = "okay";
+		status = "disabled";
 	};
 	
 	backlight2: backlight2 {
@@ -183,7 +211,16 @@
 		default-brightness-level = <11>;
 		enable1-gpios = <&gpio3 8 0>;
 		enable2-gpios = <&gpio3 14 0>;
-		status = "okay";
+		status = "disabled";
+	};
+		
+	backlight3: backlight3 {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 50000>;
+		brightness-levels = <0 4 8 16 24 32 64 72 96 128 196 255>;
+		default-brightness-level = <11>;
+		enable-gpios = <&gpio3 14 0>;
+		status = "disabled";
 	};
 	
 	v4l2_cap_0 {
@@ -209,19 +246,45 @@
 		status = "okay";
 	};
 	
+	/* For rev. PGF0533_A01 rgb parallel displays */
 	panel1: panel1 {
 		compatible = "simple-panel";
 		enable-gpios = <&gpio6 16 0>;
 		backlight = <&backlight1>;
-		status = "okay";
+		status = "disabled";
 	};	
 	
+	/* For rev. PGF0533_A01 dual bl lvds display BLC1133 */
 	panel2: panel2 {
 		compatible = "simple-panel";
-		enable-gpios = <&gpio6 16 0>;
+		enable-gpios = <&gpio2 27 0>;
 		backlight = <&backlight2>;
 		status = "disabled";
 	};	
+	
+	/* For rev. PGF0533_A01 lvds displays */
+	panel3: panel3 {
+		compatible = "simple-panel";
+		enable-gpios = <&gpio2 27 0>;
+		backlight = <&backlight3>;
+		status = "disabled";
+	};
+	
+	/* For rev. PGF0533_A02 */
+	panel4: panel4 {
+		compatible = "simple-panel";
+		enable-gpios = <&gpio6 6 0>;
+		backlight = <&backlight3>;
+		status = "disabled";
+	};
+	
+	/* For rev. PGF0533_A02 aux display */
+	panel5: panel5 {
+		compatible = "simple-panel";
+		enable-gpios = <&gpio6 16 0>;
+		backlight = <&backlight1>;
+		status = "disabled";
+	};
 
 	sound-hdmi {
 		compatible = "fsl,imx6q-audio-hdmi",
@@ -230,7 +293,7 @@
 		hdmi-controller = <&hdmi_audio>;
 	};
 
-	sound {
+	sound: sound {
 		compatible = "fsl,imx-egf-panel-sgtl5000",
 			     "fsl,imx-audio-sgtl5000";
 		model = "imx-egf-panel-sgtl5000";
@@ -281,6 +344,10 @@
 	status = "okay";
 };
 
+&clks {
+	fsl,ldb-di0-parent = <&clks IMX6QDL_CLK_PLL2_PFD0_352M>;
+};
+
 &ldb {
 	status = "okay";
 	enable-active-high;
@@ -289,32 +356,10 @@
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
 		crtc = "ipu1-di0";
-		status = "okay";
+		status = "disabled";
 		primary;
-
+		
 		lvds_channel1_timings: display-timings {
-			EGF_BLC1136: g104s1l01 {
-				clock-frequency = <40000000>;
-				hactive = <800>;
-				vactive = <600>;
-				hback-porch = <128>;
-				hfront-porch = <128>;
-				vback-porch = <14>;
-				vfront-porch = <14>;
-				hsync-len = <60>;
-				vsync-len = <1>;
-			};
-			EGF_BLC1148: det101wsnlnt0m {
-				clock-frequency = <51200000>;
-				hactive = <1024>;
-				vactive = <600>;
-				hback-porch = <160>;
-				hfront-porch = <160>;
-				vback-porch = <17>;
-				vfront-porch = <16>;
-				hsync-len = <60>;
-				vsync-len = <1>;
-			};
 			EGF_BLC1134: g121i1l01 {
 				clock-frequency = <71000000>;
 				hactive = <1280>;
@@ -337,17 +382,60 @@
 				hsync-len = <60>;
 				vsync-len = <10>;
 			};
-			EGF_BLC1135: 13080smlb4rb0s {
-				clock-frequency = <40000000>;
-				hactive = <800>;
+			EGF_BLC1168: dlc1010lzg-t-1 {
+				clock-frequency = <51200000>;
+				hactive = <1024>;
 				vactive = <600>;
-				hback-porch = <46>;
-				hfront-porch = <210>;
+				hback-porch = <160>;
+				hfront-porch = <160>;
 				vback-porch = <23>;
 				vfront-porch = <12>;
-				hsync-len = <20>;
+				hsync-len = <10>;
 				vsync-len = <10>;
 			};
+			EGF_BLC1167: dlc1010lzg-t {
+				clock-frequency = <51200000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hback-porch = <160>;
+				hfront-porch = <160>;
+				vback-porch = <23>;
+				vfront-porch = <12>;
+				hsync-len = <10>;
+				vsync-len = <10>;
+			};
+			EGF_BLC1173: dlc1010adm42lt-c-2 { 
+				clock-frequency = <51200000>;
+				hactive = <1024>;
+				vactive = <600>;
+				hback-porch = <160>;
+				hfront-porch = <160>;
+				vback-porch = <23>;
+				vfront-porch = <12>;
+				hsync-len = <10>;
+				vsync-len = <10>;
+			};
+		};
+	};
+	lvds_channel2: lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		crtc = "ipu1-di1";
+		status = "disabled";
+		primary;
+
+		lvds_channel2_timings: display-timings {
+			EGF_BLC1134_2: g121i1l01-2 {
+					clock-frequency = <71000000>;
+					hactive = <1280>;
+					vactive = <800>;
+					hback-porch = <80>;
+					hfront-porch = <80>;
+					vback-porch = <12>;
+					vfront-porch = <11>;
+					hsync-len = <60>;
+					vsync-len = <10>;
+				};
 		};
 	};
 };
@@ -519,7 +607,24 @@
 		reg = <0>;
 		spi-max-frequency = <39000>;
 	};
-
+	
+	tsc2046: tsc2046@0 {
+		compatible = "ti,tsc2046";
+		interrupt-parent = <&gpio3>;   //GPIO3_IO27
+		interrupts = <27 IRQ_TYPE_EDGE_RISING>;
+		reg = <0>;
+		pendown-gpio=<&gpio3 27 0>;
+		spi-max-frequency = <1000000>;
+	
+		ti,x-plate-ohms = /bits/ 16 <690>;
+		ti,y-plate-ohms = /bits/ 16 <204>;
+		ti,settle-delay-usec = /bits/ 16 <200>;
+		ti,penirq-recheck-delay-usecs = /bits/ 16 <150>;
+		ti,debounce-rep = /bits/ 16 <0>;
+		ti,debounce-tol = /bits/ 16 <15>;
+		ti,debounce-max = /bits/ 16 <5>;
+	};
+	
 	flash: m25p80@1 {
 		compatible = "jedec,spi-nor";
 		spi-max-frequency = <20000000>;
@@ -610,16 +715,22 @@
 		pagesize = <32>;
 	};	
 	
-	rtc@6f {
+	rtc_mcp7941x: rtc1@6f {
 		compatible = "rtc-ds1307,mcp7941x";
 		reg = <0x6F>;
 	};
 
-	rtc-eeprom@57 {
+	rtc_mcp7941x_eeprom: rtc1_eeprom@57 {
 		compatible = "at24,24c01";
 		pagesize = <1>;
 		reg = <0x57>;
 	};	
+	
+	rtc_pcf85063a: rtc2@51{
+		compatible = "nxp,pcf85063";
+		reg = <0x51>;
+	};
+	
 	
 	tmp102@0x48 {
 		reg = <0x48>;
@@ -747,6 +858,14 @@
 	status = "okay";
 };
 
+//Replace UART2 with this node for RS-485
+//&uart2 {
+//	fsl,uart-has-rtscts;
+//	linux,rs485-enabled-at-boot-time;
+//	linux,rs485-rts-on-send;
+//	status = "okay";
+//};
+
 // UART3 - 4 fili 
 &uart3 {
 	fsl,uart-has-rtscts;
@@ -832,4 +951,14 @@
     csi_id = <0>;
     v_channel = <0>;
     lanes = <2>;
+};
+
+&wdog1 {
+	status = "disabled";
+};
+
+&wdog2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <>;
+	status = "okay";
 };
