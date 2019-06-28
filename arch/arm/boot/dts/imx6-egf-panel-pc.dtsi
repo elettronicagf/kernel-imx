@@ -46,6 +46,8 @@
 		rtc_mcp7941x_eeprom = &rtc_mcp7941x_eeprom;
 		wdog1 = &wdog1;
 		wdog2 = &wdog2;
+		wifi_tiwi_sdio = &wifi_tiwi_sdio;
+		wifi_wilc_sdio = &wifi_wilc_sdio;
 	};
 
 	chosen {
@@ -890,7 +892,7 @@
 	status = "okay";
 };
 
-//wireless
+//wireless wl1271 / only 0533_A02
 &usdhc2 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_usdhc2>;
@@ -903,17 +905,30 @@
 	non-removable;    /* non-removable is not a variable, the fact it is */
 	                  /* listed is all that is used by driver  */
 	cap-power-off-card;
+	/*pm-ignore-notify;*/
 	
 	#address-cells = <1>;
 	#size-cells = <0>;
-	wlcore: wlcore@2 {
+	
+	//wireless ti tiwi / only 0533_A02 / A01
+	wifi_tiwi_sdio: wifi_tiwi_sdio@2 {
 		compatible = "ti,wl1271";
 		reg = <2>;
 		interrupt-parent = <&gpio5>;
 		interrupts = <30 IRQ_TYPE_LEVEL_HIGH>;
 		ref-clock-frequency = <38400000>;
 	};
-	
+
+	//wireless Microchip ATWILC3000 / only 0533_A03
+    wifi_wilc_sdio: wifi_wilc_sdio@1 {
+        compatible = "microchip,wilc1000", "microchip,wilc3000", "atmel,wilc_sdio";
+        reset-gpios = <&gpio5 21 0>;
+        chip_en-gpios = <&gpio2 22 0>;
+        irq-gpios = <&gpio5 30 0>;
+        status = "okay";
+        reg = <1>;
+        bus-width = <4>;
+    };
 };
 
 //eMMC Flash Interna
