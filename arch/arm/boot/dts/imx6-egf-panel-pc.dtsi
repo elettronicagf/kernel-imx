@@ -48,6 +48,7 @@
 		wdog2 = &wdog2;
 		wifi_tiwi_sdio = &wifi_tiwi_sdio;
 		wifi_wilc_sdio = &wifi_wilc_sdio;
+		reg_wlan_tiwi = &reg_wlan_tiwi;
 	};
 
 	chosen {
@@ -122,17 +123,17 @@
 			regulator-always-on;
 		};	
 		
-		reg_wlan: regulator@7 {
+		reg_wlan_tiwi: regulator@7 {
 			compatible = "regulator-fixed";
 			reg = <7>;
-			regulator-name = "wlan-supply";
+			regulator-name = "wlan-tiwi-supply";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			gpio = <&gpio5 21 0>;
 			enable-active-high;
 			regulator-boot-on;
 			regulator-always-on;
-		};
+		};			
 		
 		reg_wlan_en: regulator@8 {
 			compatible = "regulator-fixed";
@@ -141,7 +142,6 @@
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			startup-delay-us = <200000>;
-			vin-supply = <&reg_wlan>;
 			gpio = <&gpio2 22 0>;
 			enable-active-high;
 		};
@@ -905,7 +905,7 @@
 	non-removable;    /* non-removable is not a variable, the fact it is */
 	                  /* listed is all that is used by driver  */
 	cap-power-off-card;
-	/*pm-ignore-notify;*/
+	pm-ignore-notify;
 	
 	#address-cells = <1>;
 	#size-cells = <0>;
