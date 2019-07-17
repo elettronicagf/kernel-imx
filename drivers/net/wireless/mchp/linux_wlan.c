@@ -1820,14 +1820,14 @@ static void wilc_wlan_power(struct wilc *wilc, int power)
 		dev_info(wilc->dev, "succesfully got gpio_chip_en\r\n");
 	}
 
-	if (power) {
-		gpiod_direction_output(gpio_chip_en, 1);
-		mdelay(5);
-		gpiod_direction_output(gpio_reset, 1);
-	} else {
-		gpiod_direction_output(gpio_reset, 0);
-		gpiod_direction_output(gpio_chip_en, 0);
-	}
+//	if (power) {
+//		gpiod_direction_output(gpio_chip_en, 1);
+//		mdelay(5);
+//		gpiod_direction_output(gpio_reset, 1);
+//	} else {
+//		gpiod_direction_output(gpio_reset, 0);
+//		gpiod_direction_output(gpio_chip_en, 0);
+//	}
 	gpiod_put(gpio_chip_en);
 	gpiod_put(gpio_reset);
 }
@@ -1880,13 +1880,13 @@ static void wilc_wlan_power(struct wilc *wilc, int power)
 
 void wilc_wlan_power_on_sequence(struct wilc *wilc)
 {
-	wilc_wlan_power(wilc, 0);
-	wilc_wlan_power(wilc, 1);
+//	wilc_wlan_power(wilc, 0);
+//	wilc_wlan_power(wilc, 1);
 }
 
 void wilc_wlan_power_off_sequence(struct wilc *wilc)
 {
-	wilc_wlan_power(wilc, 0);
+//	wilc_wlan_power(wilc, 0);
 }
 
 MODULE_LICENSE("GPL");
