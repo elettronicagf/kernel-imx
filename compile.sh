@@ -69,7 +69,7 @@ if [ ! "$1" = "update" ]; then
 	mkdir -p $OUTPUTDIR/modules_$BUILDVER
 	rm -rf $OUTPUTDIR/modules_$BUILDVER/*
 	find build/modules/ -name "*.ko" -exec cp {} $OUTPUTDIR/modules_$BUILDVER/ \;
-	tar -C $OUTPUTDIR/modules_$BUILDVER -czvf $OUTPUTDIR/modules_$BUILDVER.tgz  .
+	tar -C $OUTPUTDIR/modules_$BUILDVER -czvf $OUTPUTDIR/modules_$BUILDVER.tgz  . --owner=root --group=root
 fi
 
 message "Output folder: $OUTPUTDIR"
