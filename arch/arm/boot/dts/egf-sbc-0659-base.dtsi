@@ -382,7 +382,10 @@
 	status = "okay";
 };
 
+
 &pwm5 {
+	clocks = <&clks IMX6UL_CLK_PWM5>,
+				<&clks IMX6UL_CLK_PWM5>;
 	status = "okay";
 };
 
