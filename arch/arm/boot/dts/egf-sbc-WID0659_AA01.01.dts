@@ -1,0 +1,62 @@
+/dts-v1/;
+#include <dt-bindings/input/input.h>
+#include "imx6ull.dtsi"
+#include "egf-sbc-0659-base.dtsi"
+
+/ {
+	model = "Elettronica GF - SBC imx6ull 0659";
+	compatible = "egf,imx6ull-sbc", "fsl,imx6ull";
+	
+	memory {
+		reg = <0x80000000 0x20000000>;
+	};
+	
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+
+		linux,cma {
+			compatible = "shared-dma-pool";
+			reusable;
+			size = <0x14000000>;
+			linux,cma-default;
+		};
+	};
+};
+
+&ecspi3 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 20 0>;
+	status = "okay";
+	dmas = <>;
+	
+	flash: w25q16@0 {
+		compatible = "jedec,spi-nor";
+		spi-max-frequency = <20000000>;
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <1>;
+		mtd0@00000000 {
+			label = "SPL";
+			reg = <0x000000 0x040000>;
+		};
+		mtd1@00040000 {
+			label = "UBOOT";
+			reg = <0x040000 0x100000>;
+		};
+		mtd2@00140000 {
+			label = "DATA";
+			reg = <0x140000 0x0A0000>;
+		};
+		mtd3@001E0000 {
+			label = "UBOOT ENV";
+			reg = <0x1E0000 0x10000>;
+		};
+		mtd4@001F0000 {
+			label = "UPDATE DATA";
+			reg = <0x1F0000 0x10000>;
+		};
+
+	};
+};
