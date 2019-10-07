@@ -12,6 +12,7 @@
 		EGF_BLC1155 = &EGF_BLC1155;
 		EGF_BLC1156 = &EGF_BLC1156;
 		EGF_BLC1165 = &EGF_BLC1165;
+		EGF_BLC1177 = &EGF_BLC1177;
 		timings = &timings;
 	};
 	
@@ -71,6 +72,14 @@
 			regulator-always-on;
 		};
 	};
+/*		
+	panel: panel {
+		compatible = "simple-panel";
+		enable-gpios = <&gpio2 14 0>;
+		backlight = <&backlight>;
+		status = "okay";
+	};
+*/
 };
 
 &adc1 {
@@ -302,6 +311,7 @@
 	pinctrl-0 = <>;
 	fb-init-white;
 	display = <&display0>;
+	enable-gpio = <&gpio2 14 GPIO_ACTIVE_LOW>;
 	status = "okay";
 
 	display0: display@0 {
@@ -309,7 +319,22 @@
 		bus-width = <24>;
 		
 		timings: display-timings {
-			native-mode = <&EGF_BLC1154>;
+			native-mode = <&EGF_BLC1177>;
+			EGF_BLC1177: RK070ER9427CT861A {
+				clock-frequency = <30000000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <210>;
+				hback-porch = <20>;
+				hsync-len = <26>;
+				vback-porch = <20>;
+				vfront-porch = <22>;
+				vsync-len = <3>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};
 			EGF_BLC1155: tm050rdh0341 {
 				clock-frequency = <30000000>;
 				hactive = <800>;
