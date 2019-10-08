@@ -230,6 +230,21 @@
 	
 };
 
+&i2c4 {
+	clock-frequency = <100000>;
+	status = "okay";
+	
+	touch: touch@4a {
+		compatible = "atmel,maxtouch";
+		reg = <0x4a>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
+	};
+};
+
+/* 		reset-gpios = <&gpio4 11 GPIO_ACTIVE_LOW>;
+*/
+
 &iomuxc {
 	imx6ul-egf-console-smart {
 		pinctrl_pwm1: pwm1grp {
