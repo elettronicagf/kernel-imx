@@ -132,10 +132,10 @@
 		pagesize = <64>;
 	};
 	
-	rtc@51 {
-		compatible = "nxp,pcf8563";
+	rtc_pcf85063a: rtc2@51{
+		compatible = "nxp,pcf85063";
 		reg = <0x51>;
-	};
+	};	
 	
 	pmic: pfuze3000@08 {
 		compatible = "fsl,pfuze3000";
