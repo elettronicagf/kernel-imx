@@ -486,12 +486,33 @@
 
 //wifi atwilc3000
 &usdhc2 {
-	cd-gpios = <>;
-	wp-gpios = <>;
-	vmmc-supply = <>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>;
 	bus-width = <4>;
 	non-removable;
 	no-1-8-v;
+	status = "okay";
+	
+    keep-power-in-suspend;
+    enable-sdio-wakeup;
+	non-removable;    /* non-removable is not a variable, the fact it is */
+	                  /* listed is all that is used by driver  */
+	cap-power-off-card;
+	pm-ignore-notify;	
+	
+	#address-cells = <1>;
+	#size-cells = <0>;	
+	
+	//wireless Microchip ATWILC3000
+    wifi_wilc_sdio: wifi_wilc_sdio@1 {
+        compatible = "microchip,wilc1000", "microchip,wilc3000", "atmel,wilc_sdio";
+        reset-gpios = <&gpio5 4 0>;
+        chip_en-gpios = <&gpio5 6 0>;
+        irq-gpios = <&gpio5 5 0>;
+        status = "okay";
+        reg = <1>;
+        bus-width = <4>;
+    };	
 };
 
 &wdog1 {

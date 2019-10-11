@@ -1789,6 +1789,9 @@ free_wl:
 #if KERNEL_VERSION(3, 13, 0) < LINUX_VERSION_CODE
 static void wilc_wlan_power(struct wilc *wilc, int power)
 {
+#if 1
+	pr_info("wifi_pm (disabled) : %d\n", power);
+#else
 	struct gpio_desc *gpio_reset;
 	struct gpio_desc *gpio_chip_en;
 
@@ -1830,6 +1833,7 @@ static void wilc_wlan_power(struct wilc *wilc, int power)
 	}
 	gpiod_put(gpio_chip_en);
 	gpiod_put(gpio_reset);
+#endif
 }
 #else
 static void wilc_wlan_power(struct wilc *wilc, int power)
