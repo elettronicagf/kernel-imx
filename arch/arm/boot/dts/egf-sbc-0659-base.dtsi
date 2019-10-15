@@ -465,14 +465,6 @@
 	status = "okay";
 };
 
-&usbphy1 {
-	tx-d-cal = <0x5>;
-};
-
-&usbphy2 {
-	tx-d-cal = <0x5>;
-};
-
 //eMMC
 &usdhc1 {
 	cd-gpios = <>;
