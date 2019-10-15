@@ -234,6 +234,13 @@
 	clock-frequency = <100000>;
 	status = "okay";
 	
+	//eeprom display data
+	24c04@56 {
+		compatible = "fsl,24c04";
+		reg = <0x56>;
+		pagesize = <16>;
+	};	
+	
 	touch: touch@4a {
 		compatible = "atmel,maxtouch";
 		reg = <0x4a>;
