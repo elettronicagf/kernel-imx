@@ -13,6 +13,7 @@
 		EGF_BLC1156 = &EGF_BLC1156;
 		EGF_BLC1165 = &EGF_BLC1165;
 		EGF_BLC1177 = &EGF_BLC1177;
+		EGF_BLC1182 = &EGF_BLC1182;
 		timings = &timings;
 	};
 	
@@ -341,7 +342,22 @@
 		bus-width = <24>;
 		
 		timings: display-timings {
-			native-mode = <&EGF_BLC1177>;
+			native-mode = <&EGF_BLC1182>;
+			EGF_BLC1182: RK101II01DCT851A {
+				clock-frequency = <70000000>;
+				hactive = <1280>;
+				vactive = <800>;
+				hfront-porch = <80>;
+				hback-porch = <40>;
+				hsync-len = <50>;
+				vback-porch = <8>;
+				vfront-porch = <8>;
+				vsync-len = <6>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <1>;
+			};			
 			EGF_BLC1177: RK070ER9427CT861A {
 				clock-frequency = <30000000>;
 				hactive = <800>;
