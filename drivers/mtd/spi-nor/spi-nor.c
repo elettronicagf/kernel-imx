@@ -622,109 +622,20 @@ static int stm_is_unlocked_sr(struct spi_nor *nor, loff_t ofs, uint64_t len,
 }
 
 /*
- * Lock a region of the flash. Compatible with ST Micro and similar flash.
- * Supports the block protection bits BP{0,1,2} in the status register
- * (SR). Does not support these features found in newer SR bitfields:
- *   - SEC: sector/block protect - only handle SEC=0 (block protect)
- *   - CMP: complement protect - only support CMP=0 (range is not complemented)
+ * Lock the whole flash. Compatible with ST Micro and similar flash.
+ * Do not supports the block protection bits BP{0,1,2} in the status register
  *
- * Support for the following is provided conditionally for some flash:
- *   - TB: top/bottom protect
- *
- * Sample table portion for 8MB flash (Winbond w25q64fw):
- *
- *   SEC  |  TB   |  BP2  |  BP1  |  BP0  |  Prot Length  | Protected Portion
- *  --------------------------------------------------------------------------
- *    X   |   X   |   0   |   0   |   0   |  NONE         | NONE
- *    0   |   0   |   0   |   0   |   1   |  128 KB       | Upper 1/64
- *    0   |   0   |   0   |   1   |   0   |  256 KB       | Upper 1/32
- *    0   |   0   |   0   |   1   |   1   |  512 KB       | Upper 1/16
- *    0   |   0   |   1   |   0   |   0   |  1 MB         | Upper 1/8
- *    0   |   0   |   1   |   0   |   1   |  2 MB         | Upper 1/4
- *    0   |   0   |   1   |   1   |   0   |  4 MB         | Upper 1/2
- *    X   |   X   |   1   |   1   |   1   |  8 MB         | ALL
- *  ------|-------|-------|-------|-------|---------------|-------------------
- *    0   |   1   |   0   |   0   |   1   |  128 KB       | Lower 1/64
- *    0   |   1   |   0   |   1   |   0   |  256 KB       | Lower 1/32
- *    0   |   1   |   0   |   1   |   1   |  512 KB       | Lower 1/16
- *    0   |   1   |   1   |   0   |   0   |  1 MB         | Lower 1/8
- *    0   |   1   |   1   |   0   |   1   |  2 MB         | Lower 1/4
- *    0   |   1   |   1   |   1   |   0   |  4 MB         | Lower 1/2
  *
  * Returns negative on errors, 0 on success.
  */
 static int stm_lock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 {
-	struct mtd_info *mtd = &nor->mtd;
 	int status_old, status_new;
-	u8 mask = SR_BP2 | SR_BP1 | SR_BP0;
-	u8 shift = ffs(mask) - 1, pow, val;
-	loff_t lock_len;
-	bool can_be_top = true, can_be_bottom = nor->flags & SNOR_F_HAS_SR_TB;
-	bool use_top;
 	int ret;
 
 	status_old = read_sr(nor);
-	if (status_old < 0)
-		return status_old;
 
-	/* If nothing in our range is unlocked, we don't need to do anything */
-	if (stm_is_locked_sr(nor, ofs, len, status_old))
-		return 0;
-
-	/* If anything below us is unlocked, we can't use 'bottom' protection */
-	if (!stm_is_locked_sr(nor, 0, ofs, status_old))
-		can_be_bottom = false;
-
-	/* If anything above us is unlocked, we can't use 'top' protection */
-	if (!stm_is_locked_sr(nor, ofs + len, mtd->size - (ofs + len),
-				status_old))
-		can_be_top = false;
-
-	if (!can_be_bottom && !can_be_top)
-		return -EINVAL;
-
-	/* Prefer top, if both are valid */
-	use_top = can_be_top;
-
-	/* lock_len: length of region that should end up locked */
-	if (use_top)
-		lock_len = mtd->size - ofs;
-	else
-		lock_len = ofs + len;
-
-	/*
-	 * Need smallest pow such that:
-	 *
-	 *   1 / (2^pow) <= (len / size)
-	 *
-	 * so (assuming power-of-2 size) we do:
-	 *
-	 *   pow = ceil(log2(size / len)) = log2(size) - floor(log2(len))
-	 */
-	pow = ilog2(mtd->size) - ilog2(lock_len);
-	val = mask - (pow << shift);
-	if (val & ~mask)
-		return -EINVAL;
-	/* Don't "lock" with no region! */
-	if (!(val & mask))
-		return -EINVAL;
-
-	status_new = (status_old & ~mask & ~SR_TB) | val;
-
-	/* Disallow further writes if WP pin is asserted */
-	status_new |= SR_SRWD;
-
-	if (!use_top)
-		status_new |= SR_TB;
-
-	/* Don't bother if they're the same */
-	if (status_new == status_old)
-		return 0;
-
-	/* Only modify protection if it will not unlock other areas */
-	if ((status_new & mask) < (status_old & mask))
-		return -EINVAL;
+	status_new = status_old |(SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
 
 	write_enable(nor);
 	ret = write_sr(nor, status_new);
@@ -734,85 +645,18 @@ static int stm_lock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 }
 
 /*
- * Unlock a region of the flash. See stm_lock() for more info
+ * Unlock the whole flash. See stm_lock() for more info
  *
  * Returns negative on errors, 0 on success.
  */
 static int stm_unlock(struct spi_nor *nor, loff_t ofs, uint64_t len)
 {
-	struct mtd_info *mtd = &nor->mtd;
 	int status_old, status_new;
-	u8 mask = SR_BP2 | SR_BP1 | SR_BP0;
-	u8 shift = ffs(mask) - 1, pow, val;
-	loff_t lock_len;
-	bool can_be_top = true, can_be_bottom = nor->flags & SNOR_F_HAS_SR_TB;
-	bool use_top;
 	int ret;
 
 	status_old = read_sr(nor);
-	if (status_old < 0)
-		return status_old;
 
-	/* If nothing in our range is locked, we don't need to do anything */
-	if (stm_is_unlocked_sr(nor, ofs, len, status_old))
-		return 0;
-
-	/* If anything below us is locked, we can't use 'top' protection */
-	if (!stm_is_unlocked_sr(nor, 0, ofs, status_old))
-		can_be_top = false;
-
-	/* If anything above us is locked, we can't use 'bottom' protection */
-	if (!stm_is_unlocked_sr(nor, ofs + len, mtd->size - (ofs + len),
-				status_old))
-		can_be_bottom = false;
-
-	if (!can_be_bottom && !can_be_top)
-		return -EINVAL;
-
-	/* Prefer top, if both are valid */
-	use_top = can_be_top;
-
-	/* lock_len: length of region that should remain locked */
-	if (use_top)
-		lock_len = mtd->size - (ofs + len);
-	else
-		lock_len = ofs;
-
-	/*
-	 * Need largest pow such that:
-	 *
-	 *   1 / (2^pow) >= (len / size)
-	 *
-	 * so (assuming power-of-2 size) we do:
-	 *
-	 *   pow = floor(log2(size / len)) = log2(size) - ceil(log2(len))
-	 */
-	pow = ilog2(mtd->size) - order_base_2(lock_len);
-	if (lock_len == 0) {
-		val = 0; /* fully unlocked */
-	} else {
-		val = mask - (pow << shift);
-		/* Some power-of-two sizes are not supported */
-		if (val & ~mask)
-			return -EINVAL;
-	}
-
-	status_new = (status_old & ~mask & ~SR_TB) | val;
-
-	/* Don't protect status register if we're fully unlocked */
-	if (lock_len == 0)
-		status_new &= ~SR_SRWD;
-
-	if (!use_top)
-		status_new |= SR_TB;
-
-	/* Don't bother if they're the same */
-	if (status_new == status_old)
-		return 0;
-
-	/* Only modify protection if it will not lock other areas */
-	if ((status_new & mask) > (status_old & mask))
-		return -EINVAL;
+	status_new = status_old & ~(SR_SRWD | SR_BP0 | SR_BP1 | SR_BP2);
 
 	write_enable(nor);
 	ret = write_sr(nor, status_new);
@@ -1098,7 +942,7 @@ static const struct flash_info spi_nor_ids[] = {
 	{ "s25sl064a",  INFO(0x010216,      0,  64 * 1024, 128, 0) },
 	{ "s25fl004k",  INFO(0xef4013,      0,  64 * 1024,   8, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
 	{ "s25fl008k",  INFO(0xef4014,      0,  64 * 1024,  16, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
-	{ "s25fl016k",  INFO(0xef4015,      0,  64 * 1024,  32, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
+	{ "s25fl016k",  INFO(0xef4015,      0,  64 * 1024,  32, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ | SPI_NOR_HAS_LOCK) },
 	{ "s25fl064k",  INFO(0xef4017,      0,  64 * 1024, 128, SECT_4K) },
 	{ "s25fl116k",  INFO(0x014015,      0,  64 * 1024,  32, SECT_4K | SPI_NOR_DUAL_READ | SPI_NOR_QUAD_READ) },
 	{ "s25fl132k",  INFO(0x014016,      0,  64 * 1024,  64, SECT_4K) },
