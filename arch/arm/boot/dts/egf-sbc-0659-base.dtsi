@@ -97,6 +97,7 @@
 &fec1 {
 	phy-mode = "rmii";
 	phy-handle = <&ethphy0>;
+	phy-reset-gpios = <&gpio2 15 GPIO_ACTIVE_LOW>;
 	status = "okay";
 	mdio {
 		#address-cells = <1>;
@@ -108,10 +109,6 @@
 		};
 	};
 	
-};
-
-&flexcan1 {
-	status = "okay";
 };
 
 &gpc {
@@ -269,6 +266,24 @@
 			>;
 		};
 	};
+	
+	pinctrl_uart1_rs232: rs232 {
+		fsl,pins = <	
+			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
+			MX6UL_PAD_UART1_RX_DATA__UART1_DCE_RX 0x1b0b1
+			MX6UL_PAD_UART1_CTS_B__UART1_DCE_CTS  0x1b0b1
+			MX6UL_PAD_UART1_RTS_B__UART1_DCE_RTS  0x1b0b1
+		>;	
+	};
+	
+	pinctrl_uart1_rs485: rs485 {
+		fsl,pins = <	
+			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
+			MX6UL_PAD_UART1_RX_DATA__UART1_DCE_RX 0x1b0b1
+			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18	  0x17059
+			MX6UL_PAD_UART1_RTS_B__GPIO1_IO19	  0x17059
+		>;	
+	};	
 	
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
@@ -464,8 +479,21 @@
 	status = "okay";
 };
 
+//&uart1 {
+//	pinctrl-names = "default";
+//	pinctrl-0 = <&pinctrl_uart1_rs232>;
+//	uart-has-rtscts;
+//	status = "okay";
+//};
+
+//Replace UART1 with this node for RS-485
 &uart1 {
-	fsl,uart-has-rtscts;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1_rs485>;
+	rts-gpios = <&gpio1 18 GPIO_ACTIVE_HIGH>;
+	cts-gpios = <&gpio1 19 GPIO_ACTIVE_HIGH>;
+	linux,rs485-enabled-at-boot-time;
+	linux,rs485-rts-on-send;
 	status = "okay";
 };
 
