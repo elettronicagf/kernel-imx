@@ -242,12 +242,20 @@
 		pagesize = <16>;
 	};	
 	
-	touch: touch@4a {
+	touch1: touch@4a {
 		compatible = "atmel,maxtouch";
 		reg = <0x4a>;
 		interrupt-parent = <&gpio4>;
 		interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
 	};
+	
+	//mxt1066t2
+	touch2: touch@4b {
+		compatible = "atmel,maxtouch";
+		reg = <0x4b>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <13 IRQ_TYPE_LEVEL_LOW>;
+	};	
 };
 
 /* 		reset-gpios = <&gpio4 11 GPIO_ACTIVE_LOW>;
