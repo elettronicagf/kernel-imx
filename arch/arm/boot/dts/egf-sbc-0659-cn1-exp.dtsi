@@ -1,0 +1,56 @@
+&flexcan1 {
+	status = "okay";
+};
+
+&pwm6 {
+	clocks = <&clks IMX6UL_CLK_PWM6>,
+				<&clks IMX6UL_CLK_PWM6>;
+	status = "okay";
+};
+
+&pwm7 {
+	clocks = <&clks IMX6UL_CLK_PWM7>,
+				<&clks IMX6UL_CLK_PWM7>;
+	status = "okay";
+};
+
+&i2c2 {
+	clock-frequency = <100000>;
+	status = "okay";
+};
+
+&ecspi1 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio1 11 0>;
+	status = "okay";
+	dmas = <>;
+	
+	spidev0: spi@0 {
+		compatible = "spidev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};
+};
+
+&ecspi2 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio4 26 0>;
+	status = "okay";
+	dmas = <>;
+	
+	spidev1: spi@0 {
+		compatible = "spidev";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+	};	
+};
+
+&uart5 {
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&uart6 {
+	fsl,uart-has-rtscts;
+	status = "okay";
+};

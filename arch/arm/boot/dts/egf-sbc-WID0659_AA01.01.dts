@@ -2,6 +2,7 @@
 #include <dt-bindings/input/input.h>
 #include "imx6ull.dtsi"
 #include "egf-sbc-0659-base.dtsi"
+#include "egf-sbc-0659-cn1-exp.dtsi"
 
 / {
 	model = "Elettronica GF - SBC imx6ull 0659";
