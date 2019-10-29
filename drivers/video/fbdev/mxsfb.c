@@ -251,6 +251,7 @@ struct mxsfb_info {
 	unsigned ld_intf_width;
 	unsigned dotclk_delay;
 	const struct mxsfb_devdata *devdata;
+	int enable_gpio;
 	struct regulator *reg_lcd;
 	bool wait4vsync;
 	struct completion vsync_complete;
@@ -752,6 +753,9 @@ static void mxsfb_enable_controller(struct fb_info *fb_info)
 	/* Recovery on underflow */
 	writel(CTRL1_RECOVERY_ON_UNDERFLOW, host->base + LCDC_CTRL1 + REG_SET);
 
+	if (gpio_is_valid(host->enable_gpio))
+		gpio_set_value(host->enable_gpio, 0);
+
 	host->enabled = 1;
 
 }
@@ -797,6 +801,9 @@ static void mxsfb_disable_controller(struct fb_info *fb_info)
 			dev_err(&host->pdev->dev,
 				"lcd regulator disable failed: %d\n", ret);
 	}
+
+	if (gpio_is_valid(host->enable_gpio))
+		gpio_set_value(host->enable_gpio, 1);
 }
 
 /**
@@ -2224,6 +2231,8 @@ static int mxsfb_probe(struct platform_device *pdev)
 		dev_err(&pdev->dev, "Failed to allocate IO resource\n");
 		return -ENOMEM;
 	}
+
+	host->enable_gpio = gpio;
 
 	fb_info = framebuffer_alloc(0, &pdev->dev);
 	if (!fb_info) {
