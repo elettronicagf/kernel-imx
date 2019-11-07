@@ -1381,7 +1381,7 @@ struct wilc_vif *wilc_netdev_ifc_init(struct wilc *wl, const char *name,
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	ndev->needs_free_netdev = true;
 #else
-	ndev->destructor = free_netdev;
+	ndev->priv_destructor = free_netdev;
 #endif
 	vif->iftype = iftype;
 	vif->wilc->vif[wl->vif_num] = vif;

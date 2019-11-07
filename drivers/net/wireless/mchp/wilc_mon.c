@@ -299,7 +299,7 @@ struct net_device *wilc_wfi_init_mon_interface(struct wilc *wl,
 #if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
 	wl->monitor_dev->needs_free_netdev = true;
 #else
-	wl->monitor_dev->destructor = free_netdev;
+	wl->monitor_dev->priv_destructor = free_netdev;
 #endif
 	if (register_netdevice(wl->monitor_dev)) {
 		PRINT_ER(real_dev, "register_netdevice failed\n");
