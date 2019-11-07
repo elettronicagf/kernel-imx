@@ -240,6 +240,10 @@ struct wilc_vif {
 	struct tcp_ack_filter ack_filter;
 	bool connecting;
 	struct wilc_priv priv;
+	struct list_head list;
+	u8 restart;
+	bool p2p_listen_state;
+	struct cfg80211_bss *bss;
 };
 
 struct wilc {
@@ -252,11 +256,13 @@ struct wilc {
 #else
 	int gpio_irq;
 #endif
+	struct clk *rtc_clk;
 	bool initialized;
 	int dev_irq_num;
 	int close;
 	u8 vif_num;
-	struct wilc_vif *vif[WILC_NUM_CONCURRENT_IFC];
+	struct list_head vif_list;
+	struct srcu_struct srcu;
 	/*protect vif list queue*/
 	struct mutex vif_mutex;
 	u8 open_ifcs;
@@ -312,7 +318,6 @@ struct wilc {
 	struct mutex deinit_lock;
 	u8 sta_ch;
 	u8 op_ch;
-	bool p2p_listen_state;
 	struct sysfs_attr_group attr_sysfs;
 	struct ieee80211_channel channels[ARRAY_SIZE(wilc_2ghz_channels)];
 	struct ieee80211_rate bitrates[ARRAY_SIZE(wilc_bitrates)];

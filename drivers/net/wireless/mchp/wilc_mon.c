@@ -29,15 +29,12 @@ void wilc_wfi_handle_monitor_rx(struct wilc *wilc, u8 *buff, u32 size)
 	struct wilc_vif *vif = 0;
 	struct sk_buff *skb = NULL;
 	struct wfi_rtap_hdr *hdr;
-	int i;
 
-	i = wilc_get_vif_from_type(wilc, WILC_MONITOR_MODE);
-	if (i < 0) {
+	vif = wilc_get_vif_from_type(wilc, WILC_MONITOR_MODE);
+	if (!vif) {
 		PRINT_D(vif->ndev, HOSTAPD_DBG, "Monitor interface not up\n");
 		return;
 	}
-
-	vif = wilc->vif[i];
 
 	skb = dev_alloc_skb(size + sizeof(*hdr));
 	if (!skb) {
@@ -296,10 +293,10 @@ struct net_device *wilc_wfi_init_mon_interface(struct wilc *wl,
 	strncpy(wl->monitor_dev->name, name, IFNAMSIZ);
 	wl->monitor_dev->name[IFNAMSIZ - 1] = 0;
 	wl->monitor_dev->netdev_ops = &wilc_wfi_netdev_ops;
-#if KERNEL_VERSION(4, 15, 0) <= LINUX_VERSION_CODE
+#if KERNEL_VERSION(4, 11, 9) <= LINUX_VERSION_CODE
 	wl->monitor_dev->needs_free_netdev = true;
 #else
-	wl->monitor_dev->priv_destructor = free_netdev;
+	wl->monitor_dev->destructor = free_netdev;
 #endif
 	if (register_netdevice(wl->monitor_dev)) {
 		PRINT_ER(real_dev, "register_netdevice failed\n");

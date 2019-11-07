@@ -18,14 +18,6 @@ enum {
 	WILC_MONITOR_MODE = 0x5
 };
 
-enum {
-	WILC_P2P_IFC = 0x00,
-	WILC_WLAN_IFC = 0x01,
-};
-
-#define IFC_0 "wlan0"
-#define IFC_1 "p2p0"
-
 #define WILC_MAX_NUM_STA			9
 #define WILC_MAX_NUM_SCANNED_CH			14
 #define WILC_MAX_NUM_PROBED_SSID		10
@@ -262,4 +254,5 @@ void wilc_network_info_received(struct wilc *wilc, u8 *buffer, u32 length);
 void wilc_gnrl_async_info_received(struct wilc *wilc, u8 *buffer, u32 length);
 void *wilc_parse_join_bss_param(struct cfg80211_bss *bss,
 				struct cfg80211_crypto_settings *crypto);
+void handle_connect_cancel(struct wilc_vif *vif);
 #endif
