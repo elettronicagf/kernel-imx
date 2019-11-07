@@ -8,6 +8,7 @@
 #include <linux/module.h>
 
 #include "wilc_wfi_netdevice.h"
+#include "wilc_wfi_cfgoperations.h"
 
 struct wilc_spi {
 	int crc_off;
@@ -123,7 +124,7 @@ static int wilc_bus_probe(struct spi_device *spi)
 	if (!spi_priv)
 		return -ENOMEM;
 
-	ret = wilc_netdev_init(&wilc, dev, HIF_SPI, &wilc_hif_spi);
+	ret = wilc_cfg80211_init(&wilc, dev, WILC_HIF_SPI, &wilc_hif_spi);
 	if (ret) {
 		kfree(spi_priv);
 		return ret;
@@ -140,8 +141,6 @@ static int wilc_bus_probe(struct spi_device *spi)
 		init_power = 1;
 	}
 
-	mutex_init(&wilc->hif_cs);
-	mutex_init(&wilc->cs);
 	wilc_bt_init(wilc);
 
 	dev_info(dev, "WILC SPI probe success\n");
@@ -1023,7 +1022,7 @@ static bool wilc_spi_is_init(struct wilc *wilc)
 	return spi_priv->is_init;
 }
 
-static int _wilc_spi_deinit(struct wilc *wilc)
+static int wilc_spi_deinit(struct wilc *wilc)
 {
 	struct wilc_spi *spi_priv = wilc->bus_data;
 
@@ -1133,20 +1132,13 @@ static int wilc_spi_read_size(struct wilc *wilc, u32 *size)
 
 static int wilc_spi_read_int(struct wilc *wilc, u32 *int_status)
 {
-	int ret;
-
-	ret = spi_internal_read(wilc, 0xe840 - WILC_SPI_REG_BASE,
+	return spi_internal_read(wilc, 0xe840 - WILC_SPI_REG_BASE,
 				int_status);
-
-	return ret;
 }
 
 static int wilc_spi_clear_int_ext(struct wilc *wilc, u32 val)
 {
-	int ret;
-
-	ret = spi_internal_write(wilc, 0xe844 - WILC_SPI_REG_BASE, val);
-	return ret;
+	return spi_internal_write(wilc, 0xe844 - WILC_SPI_REG_BASE, val);
 }
 
 static int wilc_spi_sync_ext(struct wilc *wilc, int nint)
@@ -1224,7 +1216,7 @@ static int wilc_spi_sync_ext(struct wilc *wilc, int nint)
 /* Global spi HIF function table */
 static const struct wilc_hif_func wilc_hif_spi = {
 	.hif_init = wilc_spi_init,
-	.hif_deinit = _wilc_spi_deinit,
+	.hif_deinit = wilc_spi_deinit,
 	.hif_read_reg = wilc_spi_read_reg,
 	.hif_write_reg = wilc_spi_write_reg,
 	.hif_block_rx = wilc_spi_read,
