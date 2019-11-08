@@ -72,15 +72,9 @@
 			regulator-max-microvolt = <3300000>;
 			regulator-always-on;
 		};
+		
+
 	};
-/*		
-	panel: panel {
-		compatible = "simple-panel";
-		enable-gpios = <&gpio2 14 0>;
-		backlight = <&backlight>;
-		status = "okay";
-	};
-*/
 };
 
 &adc1 {
@@ -259,14 +253,6 @@
 */
 
 &iomuxc {
-	imx6ul-egf-console-smart {
-		pinctrl_pwm1: pwm1grp {
-			fsl,pins = <
-				MX6UL_PAD_GPIO1_IO08__PWM1_OUT   0x110b0
-			>;
-		};
-	};
-	
 	pinctrl_uart1_rs232: rs232 {
 		fsl,pins = <	
 			MX6UL_PAD_UART1_TX_DATA__UART1_DCE_TX 0x1b0b1
@@ -538,7 +524,7 @@
 //wifi atwilc3000
 &usdhc2 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_usdhc2>;
+	pinctrl-0 = <>;
 	bus-width = <4>;
 	non-removable;
 	no-1-8-v;
