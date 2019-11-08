@@ -229,7 +229,7 @@
 };
 
 &i2c4 {
-	clock-frequency = <100000>;
+	clock-frequency = <400000>;
 	status = "okay";
 	
 	//eeprom display data
