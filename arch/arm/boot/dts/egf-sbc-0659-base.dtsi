@@ -38,7 +38,7 @@
 		compatible = "fsl,imx6ul-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
 		status = "okay";
 	};
-
+	
 	regulators {
 		compatible = "simple-bus";
 		#address-cells = <1>;
@@ -76,6 +76,10 @@
 
 	};
 };
+
+&pxp {
+	status = "okay";
+};	
 
 &adc1 {
 	vref-supply = <&reg_vref_adc_dummy>;
