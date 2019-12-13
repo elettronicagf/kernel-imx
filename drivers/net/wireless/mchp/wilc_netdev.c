@@ -1549,6 +1549,9 @@ static int wilc_wlan_power(struct wilc *wilc, int power)
 
 int wilc_wlan_power_on_sequence(struct wilc *wilc)
 {
+#if 1
+	pr_info("power on: skipped\n");
+#else
 	int ret;
 
 	ret = wilc_wlan_power(wilc, 0);
@@ -1557,18 +1560,21 @@ int wilc_wlan_power_on_sequence(struct wilc *wilc)
 	ret = wilc_wlan_power(wilc, 1);
 	if (ret)
 		return ret;
-
+#endif
 	return 0;
 }
 
 int wilc_wlan_power_off_sequence(struct wilc *wilc)
 {
+#if 1
+	pr_info("power off: skipped\n");
+#else
 	int ret;
 
 	ret = wilc_wlan_power(wilc, 0);
 	if (ret)
 		return ret;
-
+#endif
 	return 0;
 }
 
