@@ -78,6 +78,7 @@
 #define IMX7_TEMPSENSE1_TEMP_VALUE_SHIFT	0
 #define IMX7_TEMPSENSE1_TEMP_VALUE_MASK		0x1ff
 
+#define OCOTP_MEM0			0x0480
 #define IMX6_OCOTP_ANA1		0x04e0
 #define IMX7_OCOTP_ANA1		0x04f0
 
@@ -88,11 +89,6 @@ enum imx_thermal_trip {
 	IMX_TRIP_NUM,
 };
 
-/*
- * It defines the temperature in millicelsius for passive trip point
- * that will trigger cooling action when crossed.
- */
-#define IMX_TEMP_PASSIVE		85000
 #define IMX_TEMP_PASSIVE_COOL_DELTA	10000
 
 #define IMX_POLLING_DELAY		2000 /* millisecond */
@@ -225,6 +221,7 @@ struct imx_thermal_data {
 	u32 c1, c2; /* See formula in imx_get_sensor_data() */
 	unsigned long temp_passive;
 	unsigned long temp_critical;
+	unsigned long temp_max;
 	unsigned long alarm_temp;
 	unsigned long last_temp;
 	bool irq_enabled;
@@ -232,6 +229,7 @@ struct imx_thermal_data {
 	struct clk *thermal_clk;
 	struct mutex mutex;
 	const struct thermal_soc_data *socdata;
+	const char *temp_grade;
 };
 
 static struct imx_thermal_data *imx_thermal_data;
@@ -461,7 +459,7 @@ static int imx_set_trip_temp(struct thermal_zone_device *tz, int trip,
 	}
 
 	if (trip == IMX_TRIP_PASSIVE) {
-		if (temp > IMX_TEMP_PASSIVE)
+		if (temp > data->temp_critical)
 			return -EINVAL;
 		data->temp_passive = temp;
 		imx_set_alarm_temp(data, temp);
@@ -621,17 +619,38 @@ static int imx_get_sensor_data(struct platform_device *pdev)
 	else
 		imx6_calibrate_data(data, val);
 
-	/*
-	 * Set the default passive cooling trip point to IMX_TEMP_PASSIVE.
-	 * Can be changed from userspace.
-	 */
-	data->temp_passive = IMX_TEMP_PASSIVE;
+	/* use OTP for thermal grade */
+	ret = regmap_read(map, OCOTP_MEM0, &val);
+	if (ret) {
+		dev_err(&pdev->dev, "failed to read temp grade: %d\n", ret);
+		return ret;
+	}
+
+	/* The maximum die temp is specified by the Temperature Grade */
+	switch ((val >> 6) & 0x3) {
+	case 0: /* Commercial (0 to 95C) */
+		data->temp_grade = "Commercial";
+		data->temp_max = 95000;
+		break;
+	case 1: /* Extended Commercial (-20 to 105C) */
+		data->temp_grade = "Extended Commercial";
+		data->temp_max = 105000;
+		break;
+	case 2: /* Industrial (-40 to 105C) */
+		data->temp_grade = "Industrial";
+		data->temp_max = 105000;
+		break;
+	case 3: /* Automotive (-40 to 125C) */
+		data->temp_grade = "Automotive";
+		data->temp_max = 125000;
+		break;
+	}
 
 	/*
-	 * Set the default critical trip point to 20 C higher
-	 * than passive trip point. Can be changed from userspace.
+	 * Set the passive trip point at 10C under max (can change via sysfs)
 	 */
-	data->temp_critical = IMX_TEMP_PASSIVE + 20 * 1000;
+	data->temp_critical = data->temp_max;
+	data->temp_passive = data->temp_max - (1000 * 10);
 
 	return 0;
 }
@@ -843,6 +862,11 @@ static int imx_thermal_probe(struct platform_device *pdev)
 		devfreq_cooling_unregister(data->cdev[1]);
 		return ret;
 	}
+
+	dev_info(&pdev->dev, "%s CPU temperature grade - max:%ldC"
+		 " critical:%ldC passive:%ldC\n", data->temp_grade,
+		 data->temp_max / 1000, data->temp_critical / 1000,
+		 data->temp_passive / 1000);
 
 	/* Enable measurements at ~ 10 Hz */
 	regmap_write(map, data->socdata->measure_freq_ctrl + REG_CLR,
