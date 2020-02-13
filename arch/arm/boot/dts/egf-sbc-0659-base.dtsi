@@ -14,6 +14,7 @@
 		EGF_BLC1165 = &EGF_BLC1165;
 		EGF_BLC1177 = &EGF_BLC1177;
 		EGF_BLC1182 = &EGF_BLC1182;
+		EGF_BLC1185 = &EGF_BLC1185;
 		timings = &timings;
 	};
 	
@@ -386,6 +387,21 @@
 				de-active = <1>;
 				pixelclk-active = <0>;
 			};
+			EGF_BLC1185: RK050BR62CT849A {
+				clock-frequency = <30000000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <210>;
+				hback-porch = <46>;
+				hsync-len = <26>;
+				vback-porch = <20>;
+				vfront-porch = <22>;
+				vsync-len = <3>;
+				hsync-active = <0>;
+				vsync-active = <0>;
+				de-active = <1>;
+				pixelclk-active = <0>;
+			};			
 			EGF_BLC1155: tm050rdh0341 {
 				clock-frequency = <30000000>;
 				hactive = <800>;
