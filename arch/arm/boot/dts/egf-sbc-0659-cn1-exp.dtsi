@@ -16,7 +16,7 @@
 
 &i2c2 {
 	clock-frequency = <100000>;
-	status = "okay";
+	status = "disabled";
 };
 
 &ecspi1 {
