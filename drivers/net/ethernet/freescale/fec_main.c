@@ -3331,6 +3331,7 @@ static void fec_reset_phy(struct platform_device *pdev)
 {
 	int err, phy_reset;
 	int msec = 1;
+	int msec_wait = 1;
 	struct device_node *np = pdev->dev.of_node;
 
 	if (!np)
@@ -3353,6 +3354,12 @@ static void fec_reset_phy(struct platform_device *pdev)
 	}
 	msleep(msec);
 	gpio_set_value(phy_reset, 1);
+	
+	err = of_property_read_u32(np, "phy-reset-wait", &msec_wait);
+	/* A sane reset duration should not be longer than 1s */
+	if (!err && msec_wait > 1000)
+		msec_wait = 1;
+	msleep(msec_wait);
 }
 #else /* CONFIG_OF */
 static void fec_reset_phy(struct platform_device *pdev)
