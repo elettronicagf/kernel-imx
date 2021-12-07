@@ -25,6 +25,11 @@
 
 #define	RTL8211E_INER_LINK_STATUS	0x400
 
+#define MIIM_RTL8211F_PAGE_SELECT      0x1f
+#define MDIO_MMD_PCS		3	/* Physical Coding Sublayer */
+#define MDIO_CTRL1		MII_BMCR
+#define PHY_RTL8211F_FORCE_EEE_RXC_ON 1 << 3
+
 MODULE_DESCRIPTION("Realtek PHY driver");
 MODULE_AUTHOR("Johnson Leung");
 MODULE_LICENSE("GPL");
@@ -64,6 +69,39 @@ static int rtl8211e_config_intr(struct phy_device *phydev)
 	return err;
 }
 
+static int rtl8211f_config_init(struct phy_device *phydev)
+{
+	u16 reg;
+
+	if (phydev->dev_flags & PHY_RTL8211F_FORCE_EEE_RXC_ON) {
+		unsigned int reg;
+
+		reg = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1);
+		reg &= ~0x400;
+		phy_write_mmd(phydev, MDIO_MMD_PCS, MDIO_CTRL1, reg);
+	}
+
+	phy_write(phydev, MII_BMCR, BMCR_RESET);
+
+	phy_write(phydev, MIIM_RTL8211F_PAGE_SELECT, 0xd08);
+	reg = phy_read(phydev, 0x11);
+
+	/* enable RX-delay for rgmii-id and rgmii-rxid, otherwise disable it */
+	reg = phy_read(phydev, 0x15);
+
+	/* restore to default page 0 */
+	phy_write(phydev, MIIM_RTL8211F_PAGE_SELECT, 0x0);
+
+	/* Set green LED for Gigabit Link, yellow LED for Active */
+	phy_write(phydev, MIIM_RTL8211F_PAGE_SELECT, 0xd04);
+	phy_write(phydev, 0x10, 0x207f);
+	phy_write(phydev, MIIM_RTL8211F_PAGE_SELECT, 0x0);
+
+	genphy_config_aneg(phydev);
+
+	return 0;
+}
+
 static struct phy_driver realtek_drvs[] = {
 	{
 		.phy_id         = 0x00008201,
@@ -98,6 +136,20 @@ static struct phy_driver realtek_drvs[] = {
 		.suspend	= genphy_suspend,
 		.resume		= genphy_resume,
 		.driver		= { .owner = THIS_MODULE,},
+	}, {
+		.phy_id		= 0x001cc916,
+		.name		= "RTL8211F Gigabit Ethernet",
+		.phy_id_mask	= 0x001fffff,
+		.features	= PHY_GBIT_FEATURES,
+		.flags		= PHY_HAS_INTERRUPT,
+		.config_init = &rtl8211f_config_init,
+		.config_aneg	= &genphy_config_aneg,
+		.read_status	= &genphy_read_status,
+		.ack_interrupt	= &rtl821x_ack_interrupt,
+		.config_intr	= &rtl8211e_config_intr,
+		.suspend	= genphy_suspend,
+		.resume		= genphy_resume,
+		.driver		= { .owner = THIS_MODULE,},
 	},
 };
 
@@ -106,6 +158,7 @@ module_phy_driver(realtek_drvs);
 static struct mdio_device_id __maybe_unused realtek_tbl[] = {
 	{ 0x001cc912, 0x001fffff },
 	{ 0x001cc915, 0x001fffff },
+	{ 0x001cc916, 0x001fffff },
 	{ }
 };
 

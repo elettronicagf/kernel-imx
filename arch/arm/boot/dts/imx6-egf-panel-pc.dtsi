@@ -946,9 +946,12 @@
 	pinctrl-0 = <&pinctrl_enet>;
 	phy-mode = "rgmii";
 	phy-reset-gpios = <&gpio1 25 0>;
+	phy-reset-duration = <60>;
+	phy-reset-wait = <70>;
 	fsl,magic-packet;
 	status = "okay";
 };
+
 &usbh1 {
 	vbus-supply = <&reg_usb_h1_vbus>;
 	status = "okay";
